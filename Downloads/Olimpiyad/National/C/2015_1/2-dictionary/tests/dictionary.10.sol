@@ -1,2 +1,0 @@
-6
-efghijklmnopq rstuvwxyzabc defghijklmnopqrstuvw xyzabcdefghijklmnopq rstuvwxyzabcdef ghijklmnopqrstuvwxyz
