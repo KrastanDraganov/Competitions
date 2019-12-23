@@ -1,0 +1,136 @@
+#include <iostream>
+#include <algorithm>
+#include <math.h>
+using namespace std;
+unsigned int const NN=1000;
+typedef unsigned long long Long;
+Long const MAXLong=0xFFFFFFFFFFFFFFFFLL;
+Long v[6],r[3],p[6][64];
+int d[6];
+Long MinSum;
+bool isPrime(Long a)
+{if (a==1) return false;
+ if (a==2) return true;
+ if (!(a&1)) return false;
+ Long s=(Long)ceil(sqrt(a));
+ Long t=3;
+ while (t<=s)
+ {if (!(a%t)) return false;
+  t+=2;
+ }
+ return true;
+}
+Long gcd(Long a,Long b)
+{Long c;
+ if (a<b) swap(a,b);
+ do
+ {c=a%b;
+  if (!c) return b;
+  a=b;
+  b=c;
+ }while (true);
+}
+bool chk(int i,int j, int k)
+{if (gcd(v[i],gcd(v[j],v[k]))>1) return false;
+ if (gcd(v[i],v[j])==1 &&
+     gcd(v[i],v[k])==1 &&
+     gcd(v[j],v[k])==1) return false;
+ return true;
+}
+bool nextDraw(int n,int k,int *a)
+{int i=k-1;
+ while (i>=0 && a[i]==n-k+i) i--;
+ if (i<0) return false;
+ a[i]++;
+ for (i=i+1;i<k;i++) a[i]=a[i-1]+1;
+ return true;
+}
+bool check(void)
+{int b[3],i;
+ for (i=0;i<3;i++) b[i]=i;
+ b[2]++;
+ do
+  if (!chk(b[0],b[1],b[2])) return false;
+ while (nextDraw(6,3,b));
+ return true;
+}
+void makePrimes(Long a,int *d, Long *p, Long Not)
+{Long P=2;
+ p[0]=1;
+ *d=1;
+ do
+ {if (!(a%P))
+  {if (Not%P) p[(*d)++]=P;
+   do a/=P; while (!(a%P));
+  }
+  if (P&1) P+=2; else P++;
+ }while (P<=a);
+}
+void go(int vFrom,int vTo,Long s)
+{int i;
+ if (s>=MinSum) return;
+ if (vFrom==5)
+ {if (check()){MinSum=s;
+               for (i=0;i<3;i++) r[i]=v[3+i];
+              }
+  return;
+ }
+ for (i=0;i<d[vFrom];i++)
+ {if (vFrom>2) v[vFrom]*=p[vFrom][i];
+  if (vTo>2)v[vTo]*=p[vFrom][i];
+  if (vTo<5) go(vFrom,vTo+1,v[3]+v[4]+v[5]);
+  else go(vFrom+1,max(3,vFrom+2),v[3]+v[4]+v[5]);
+  if (vTo>2)v[vTo]/=p[vFrom][i];
+  if (vFrom>2) v[vFrom]/=p[vFrom][i];
+ }
+}
+void solve(Long a, Long b, Long c)
+{int i,j;
+ Long t[3],P;
+ v[0]=a; v[1]=b; v[2]=c;
+ if (!chk(0,1,2)){cout<<0<<endl;return;}
+ t[0]=v[1]*v[2];
+ t[1]=v[0]*v[2];
+ t[2]=v[0]*v[1];
+ for (i=0;i<3;i++)makePrimes(v[i],&d[i],p[i],t[i]);
+ for (i=3;i<6;i++) {v[i]=1;p[i][0]=1;d[i]=4;}
+ P=2;
+ i=1;
+ do
+ {if (v[0]%P && v[1]%P && v[2]%P && isPrime(P))
+  {for (j=3;j<6;j++) p[j][i]=P;
+   i++;
+  }
+  if (P&1) P+=2;
+  else P++;
+ }while (i<4);
+ MinSum=MAXLong;
+ go(0,3,0);
+ if (MinSum<MAXLong)
+  for (i=0;i<3;i++) {cout<<r[i];
+                     if (i<2) cout<<' ';
+                    }
+ else cout<<0;
+ cout<<endl;
+}
+
+int main(void)
+{Long a,b,c;
+ //Long a=2*3*5*17,b=2*7*11*13,c=1;
+// Long a=19,b=2*3*11,c=3*5*7;
+// Long a=12,b=12,c=5*7*11;
+// Long a=6,b=15,c=10;
+// Long a=6,b=15,c=2*7*11;
+// Long a=2*3*5*7*11,b=3*17,c=2*7*11;
+// Long a=2*3*5*7*11,b=3*17,c=2*7*11*17;
+// Long a=2*3*7,b=3*5,c=5*11*13;
+//  Long a=874,b=3553,c=2737;
+//  Long a=15,b=55,c=42;
+//  Long a=646, b=1729, c=2431;
+// cout<<a<<' '<<b<<' '<<c<<endl;
+ cin>>a>>b>>c;
+ solve(a,b,c);
+ cin>>a>>b>>c;
+ solve(a,b,c);
+ return 0;
+}

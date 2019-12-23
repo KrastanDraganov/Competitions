@@ -1,0 +1,167 @@
+#include<iostream>
+#include<vector>
+
+using namespace std;
+
+    bool simple[200000], used2[100002];
+    int used[100002];
+    
+    vector<int> vec;
+    
+    int mas[10];
+
+    int X, Y, Z, a, b, c;
+    int sum;
+    int tsum;
+    
+void erat()
+{
+     simple[0] = 1; simple[1] = 1;
+     
+     for( int i = 2; i*i <= 100000; ++i )
+     if( simple[i] == 0 )
+     {
+       for( int j = i*i; j <= 100000; j += i ) simple[j] = 1;
+     }
+}
+   int iter = 0;
+   
+void rec(int pos)
+{
+     if(tsum > sum)return;
+     
+     if(iter > 300000)return;
+     iter++;
+     
+     if(pos==3)
+     {
+      mas[3] = a;
+      mas[4] = b;
+      mas[5] = c;
+      
+      tsum = mas[0] + mas[1] + mas[2];
+      
+      for( int i = 0; i < 6; ++i )
+       for( int j = i + 1; j < 6; ++j )
+        for( int q = j + 1; q < 6; ++q )
+        if(__gcd(__gcd(mas[i],mas[j]),mas[q]) != 1 ) return;
+        else
+        {
+         if( __gcd(mas[i],mas[j])==1 && __gcd(mas[i],mas[q])==1 && __gcd(mas[j],mas[q])==1)return;
+        }
+        
+      if( sum > tsum )
+      {
+          sum = tsum;
+          X = mas[0];
+          Y = mas[1];
+          Z = mas[2];
+      }
+      return;
+     }
+     
+     
+       
+     for( int i = 0; i < (int)vec.size(); ++i )
+     if(used[vec[i]] < 2)
+      for( int j = i + 1; j < (int)vec.size(); ++j )
+      if(used[vec[j]] < 2)
+       {
+           mas[pos] = vec[i] * vec[j];
+           used[vec[i]]++;
+           used[vec[j]]++;
+           tsum+=mas[pos];
+           rec(pos+1);
+           tsum-=mas[pos];
+           used[vec[j]]--;
+           used[vec[i]]--;
+       }
+     
+     for( int i = 0; i < (int)vec.size(); ++i )
+       {
+           mas[pos] = vec[i];
+           used[vec[i]]++;
+           tsum += mas[pos];
+           rec(pos+1);
+           tsum -= mas[pos];
+           used[vec[i]]--;
+       }   
+       
+       for( int i = 0; i < (int)vec.size(); ++i )
+     if(used[vec[i]] < 2)
+      for( int j = i + 1; j < (int)vec.size(); ++j )
+      if(used[vec[j]] < 2)
+       for( int q= j + 1; q < (int)vec.size(); ++ q)
+       if(used[vec[q]] < 2)
+       {
+           mas[pos] = vec[i] * vec[j] * vec[q];
+           used[vec[i]]++;
+           used[vec[j]]++;
+           used[vec[q]]++;
+           tsum+=mas[pos];
+           rec(pos+1);
+           used[vec[j]]--;
+           used[vec[i]]--;
+           used[vec[q]]--;
+           tsum-=mas[pos];
+       }
+}
+
+void solve()
+{
+     scanf("%d%d%d", &a, &b, &c);
+     iter = 0;
+     if( __gcd(__gcd(a,b),c) != 1 ){printf("0\n");return;}
+     if( __gcd(a,b) == 1 && __gcd(b,c)==1 && __gcd(a,c) == 1 ){printf("0\n");return;}
+     //printf("lala\n");
+     erat();
+     
+     vec.clear();
+     
+     memset(used, 0, sizeof(used));
+     memset(used2, 0, sizeof(used2));
+     
+     for( int i = 2; i <= a; ++i )
+      if( a % i == 0 && !simple[i] ) {used[i]++; }
+      
+     for( int i = 2; i <= b; ++i )
+      if( b % i == 0 && !simple[i] ) {  used[i]++;}
+      
+     for( int i = 2; i <= c; ++i )
+      if( c % i == 0 && !simple[i] ) {  used[i]++; }
+     
+     for( int i = 2; i <= 100000; ++i ) 
+       if(used[i] == 1) { vec.push_back(i); used2[i] = 1; }
+     
+     if( (int)vec.size() == 0 ) {printf("0\n");return;}
+     
+     sort(vec.begin(),vec.end());
+     
+     
+     int cnt = 0;
+     
+     for( int i = 2; i <= 100000; ++i ) 
+      if( simple[i] == 0 && used[i] == 0 && used2[i] == 0 )
+      {
+         vec.push_back(i);
+         cnt++;
+         if((int)vec.size() == 9)break;
+      } 
+      
+     sort(vec.begin(),vec.end());
+     
+     sum = 100000000;
+     
+  //   for( int i = 0; i < (int)vec.size(); ++i )
+   //   cout<<vec[i]<<" "; cout<<"\n";
+     rec(0);
+     if(sum!=100000000)printf("%d %d %d\n",X, Y, Z);
+     else printf("0\n");
+}
+int main()
+{
+    erat();
+    
+    solve(); solve();
+return 0;    
+}

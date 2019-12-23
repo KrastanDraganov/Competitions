@@ -1,0 +1,100 @@
+#include <iostream>
+#include <stdlib.h>
+#include <ext/hash_set>
+
+using namespace std;
+using namespace __gnu_cxx;
+
+int n, m, t, s;
+int state[2][100][100];
+
+bool reachable(int x1, int y1, int x2, int y2) {
+	int d = (t * s) - abs(x1 - x2) - abs(y1 - y2);
+	return ((d >= 0) && (d % 2 == 0));
+}
+
+bool place(int i, hash_set<int> edges[], int assigned[], bool visited[]) {
+	if (visited[i]) {
+		return false;
+	}
+	visited[i] = true;
+	for (hash_set<int>::const_iterator it = edges[i].begin(); it != edges[i].end(); it++) {
+		int j = *it;
+		int a = assigned[j];
+		if ((a == -1) || (place(a, edges, assigned, visited))) {
+			assigned[j] = i;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool solve() {
+	// find the number of particles
+	int count = 0, count2 = 0;
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			count += state[0][i][j];
+			count2 += state[1][i][j];
+		}
+	}
+	if (count != count2) {
+		return false;
+	}
+	// find the end positions of the particles
+	int x2[count];
+	int y2[count];
+	int c = 0;
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			for (int k = 0; k < state[1][i][j]; k++) {
+				x2[c] = i;
+				y2[c] = j;
+				c++;
+			}
+		}
+	}
+	// construct a set of reachable end positions for each starting position
+	hash_set<int> edges[count];
+	c = 0;
+	for (int x1 = 0; x1 < n; x1++) {
+		for (int y1 = 0; y1 < m; y1++) {
+			for (int k = 0; k < state[0][x1][y1]; k++) {
+				for (int t = 0; t < count; t++) {
+					if (reachable(x1, y1, x2[t], y2[t])) {
+						edges[c].insert(t);
+					}
+				}
+				c++;
+			}
+		}
+	}
+	// try to find a maximal matching
+	int assigned[count];
+	bool visited[count];
+	for (int i = 0; i < count; i++) {
+		assigned[i] = -1;
+	}
+	for (int i = 0; i < count; i++) {
+		for (int j = 0; j < count; j++) {
+			visited[j] = false;
+		}
+		if (!place(i, edges, assigned, visited)) {
+			return false;
+		}
+	}
+	return true;
+}
+
+int main(void) {
+	cin >> n >> m >> t >> s;
+	for (int k = 0; k < 2; k++) {
+		for (int j = 0; j < m; j++) {
+			for (int i = 0; i < n; i++) {
+				cin >> state[k][i][j];
+			}
+		}
+	}
+	cout << (solve() ? 'Y' : 'N') << endl;
+	return 0;
+}
