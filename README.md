@@ -1,2 +1,2 @@
 # Competitions
-Solutions to Competitive Programming problems from national and international competitions.
+Solutions to competitive programming problems from Bulgarian and international competitions.
