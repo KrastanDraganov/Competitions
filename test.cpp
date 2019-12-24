@@ -125,7 +125,6 @@ Long eval()
 	Long ans = rightIdx; ans -= leftIdx; ans += 1;
 	while (leftIdx.notZero()) {a[lena++] = leftIdx.parity(); leftIdx.divideByTwo();}
 	while (rightIdx.notZero()) {b[lenb++] = rightIdx.parity(); rightIdx.divideByTwo();}
-	
 	if (k > lenb) return 0;
 	memset(vis, 0, sizeof(vis));
 	ans -= recurse(lenb - 1, 0, 0, 0);

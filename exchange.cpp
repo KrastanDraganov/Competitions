@@ -1,11 +1,10 @@
 #include<iostream>
 #include<cstring>
-#include<algorithm>
 #define endl '\n'
 using namespace std;
-const int MAXM=12,BASE=1e9;
+const int MAXN=203,BASE=1e9;
 struct Long {
-    int len,digits[16];
+    int len,digits[53];
     Long(){
         len=1;
         memset(digits,0,sizeof(digits));
@@ -20,7 +19,7 @@ struct Long {
     }
     Long(const Long& num){
         len=num.len;
-        for(int i=0;i<16;++i){
+        for(int i=0;i<53;++i){
             digits[i]=num.digits[i];
         }
     }
@@ -48,34 +47,45 @@ struct Long {
         }
         fprintf(stdout,"\n");
     }
-} dp[MAXM];
-int wanted[MAXM];
+} dp[MAXN][2003];
+bool visited[MAXN][2003],already[203];
+int value[MAXN],counter[MAXN],value_ind[203];
+Long calc(int ind, int sum, int s, int n){
+    if(sum==s){
+        return 1;
+    }
+    if(ind>=n or sum>s){
+        return 0;
+    }
+    if(visited[ind][sum]){
+        return dp[ind][sum];
+    }
+    Long& ans=dp[ind][sum];
+    for(int i=0;i<=counter[ind] and sum+i*value[ind]<=s;++i){
+        ans+=calc(ind+1,sum+i*value[ind],s,n);
+    }
+    visited[ind][sum]=true;
+    return ans;
+}
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-    int n,m;
-    cin>>n>>m;
-    for(int i=0;i<m;++i){
-        cin>>wanted[i];
+    int s,n;
+    cin>>s>>n;
+    for(int i=0;i<n;++i){
+        cin>>value[i];
     }
-    dp[0]=1;
-    for(int i=1;i<=n;++i){
-        int dub=i;
-        string s="";
-        while(dub){
-            s+=(dub%10)+'0';
-            dub/=10;
-        }
-        reverse(s.begin(),s.end());
-        for(int i=0;i<s.size();++i){
-            int curr=s[i]-'0';
-            for(int i2=0;i2<m;++i2){
-                if(curr==wanted[i2]){
-                    dp[i2+1]+=dp[i2];
-                }
-            }
+    for(int i=0;i<n;++i){
+        cin>>counter[i];
+        if(already[value[i]]){
+            counter[value_ind[value[i]]]+=counter[i];
+            counter[i]=0;
+        }else{
+            already[value[i]]=true;
+            value_ind[value[i]]=i;
         }
     }
-    dp[m].print();
+    Long ans=calc(0,0,s,n);
+    ans.print();
 return 0;
 }
