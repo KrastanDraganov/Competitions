@@ -1,162 +1,94 @@
-/*
-ID: espr1t
-TASK: crypto
-LANG: C++
-*/
-#include <cstdio>
-#include <cstring>
-#include <algorithm>
+#include <iostream>
+#include <stdlib.h>     /* qsort */
 
-#define MAX 404
-#define NUM_DIGITS 16
-#define BASE 1000000000
+#define MAX_N 10000
+#define MAX_EDGE 70001
+#define MIN_Y 0
+#define MAX_Y 30000
+
 using namespace std;
-FILE *in; FILE *out;
-struct Long
-{
-	int len;
-	int digits[NUM_DIGITS];
-	
-	Long()
-	{
-		len = 1;
-		memset(digits, 0, sizeof(digits));
-	}
-	
-	Long(long long num)
-	{
-		len = 0;
-		memset(digits, 0, sizeof(digits));
 
-		while (num)
-		{
-			digits[len++] = num % BASE;
-			num /= BASE;
-		}
-		if (len == 0) len++;
-	}
-	
-	Long(const Long& right)
-	{
-		len = right.len;
-		for (int i = 0; i < NUM_DIGITS; i++)
-			digits[i] = right.digits[i];
-	}
-	
-	void operator -= (const Long& right)
-	{
-		for (int i = len - 1; i >= 0; i--)
-			digits[i] -= right.digits[i];
-		for (int i = 0; i < len; i++)
-			if (digits[i] < 0) {digits[i] += BASE; digits[i + 1]--;}
-		while (len > 1 && digits[len - 1] == 0) len--;
-	}
-	
-	void operator += (const Long& right)
-	{
-		len = max(len, right.len);
-		int carry = 0;
-		for (int i = 0; i < len; i++)
-		{
-			carry += digits[i] + right.digits[i];
-			if (carry >= BASE) {digits[i] = carry - BASE; carry = 1;}
-			else {digits[i] = carry; carry = 0;}
-		}
-		if (carry) digits[len++] = carry;
-	}
-	
-	int parity() {return digits[0] & 1;}
-	void divideByTwo()
-	{
-		for (int i = 0; i < len; i++)
-		{
-			digits[i] >>= 1;
-			if (i < len - 1) if (digits[i + 1] & 1) digits[i] += (BASE >> 1);
-		}
-		while (len > 1 && digits[len - 1] == 0) len--;
-	}
-	
-	bool notZero()
-	{
-		return len > 1 || digits[0] != 0;
-	}
-	
-	void print()
-	{
-		fprintf(out, "%d", digits[len - 1]);
-		for (int i = len - 2; i >= 0; i--)
-			fprintf(out, "%09d", digits[i]);
-	}
-};
+int edge[MAX_EDGE];
+int sum[MAX_EDGE];
+int e[2*MAX_N][4]; //(x,y0,y1,flag=+-1)
+long long en;
+int n;
+long long area;
 
-
-int k;
-int a[MAX], lena;
-int b[MAX], lenb;
-Long leftIdx, rightIdx;
-char vis[MAX][MAX][2][2];
-Long dyn[MAX][MAX][2][2];
-
-Long recurse(int idx, int ones, int flag1, int flag2)
-{
-	if (ones >= k) return 0;
-	if (idx < 0) return 1;
-	if (vis[idx][ones][flag1][flag2])
-		return dyn[idx][ones][flag1][flag2];
-	
-	Long ans = 0;
-	// Set this position to 0
-	if (flag1 || a[idx] == 0)
-		ans += recurse(idx - 1, 0, flag1, flag2 || b[idx] > 0);
-		
-	// Set this position to 1
-	if (flag2 || b[idx] == 1)
-		ans += recurse(idx - 1, ones + 1, flag1 || a[idx] < 1, flag2);
-	
-	vis[idx][ones][flag1][flag2] = 1;	
-	return dyn[idx][ones][flag1][flag2] = ans;
+static int comp(const void* p1, const void* p2) {
+  int* arr1 = (int*)p1;
+  int* arr2 = (int*)p2;
+  int diff1 = arr1[0] - arr2[0];
+  if (diff1) return diff1;
+  return arr1[3] - arr2[3];
 }
-
-Long eval()
-{
-	memset(a, 0, sizeof(a)); lena = 0;
-	memset(b, 0, sizeof(b)); lenb = 0;
-	
-	Long ans = rightIdx; ans -= leftIdx; ans += 1;
-	while (leftIdx.notZero()) {a[lena++] = leftIdx.parity(); leftIdx.divideByTwo();}
-	while (rightIdx.notZero()) {b[lenb++] = rightIdx.parity(); rightIdx.divideByTwo();}
-	if (k > lenb) return 0;
-	memset(vis, 0, sizeof(vis));
-	ans -= recurse(lenb - 1, 0, 0, 0);
-	return ans;
+void inpData(){
+    int i, x1,x2,y1,y2;
+    cin>>n;
+    en = 0;
+    for(i=1; i<=n; i++){
+        cin>>x1>>y1>>x2>>y2;
+        e[en][0]=x1;
+        e[en][1]=y1;
+        e[en][2]=y2;
+        e[en][3]=1;
+        en++;
+        e[en][0]=x2;
+        e[en][1]=y1;
+        e[en][2]=y2;
+        e[en][3]=-1;
+        en++;
+    }
+}// End of Read_data
+void correct(long long v,long long min_value,long long max_value){
+if((edge[v]==0) && (min_value<max_value))
+      sum[v]=sum[2*v]+sum[2*v+1];
 }
-
-
-Long parseLong()
-{
-	char temp[128];
-	fscanf(in, "%s", temp);
-	
-	Long ret; ret.len = 0;
-	int idx = 0, mul[9] = {1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000};
-	for (int i = (int)strlen(temp) - 1; i >= 0; i--)
-	{
-		ret.digits[ret.len] += (int)(temp[i] - 48) * mul[idx++];
-		if (idx >= 9) {idx = 0; ret.len++;}
-	}
-	if (idx != 0) ret.len++;
-	return ret;
+void add(long long v, int min_value, int max_value, int y0, int y1, int delta ){
+int tmp, res;
+if((y0<=min_value) && (max_value<=y1)){
+      res=(max_value+1-min_value)*delta;
+      if(delta>0){
+        edge[v]=edge[v]+delta;
+        sum[v]=res;
+      }else{
+            edge[v]=edge[v]+delta;
+            if(edge[v]==0){
+               sum[v]=0;
+               correct(v,min_value,max_value);
+            }
+      }
+} else if(min_value<max_value){
+         tmp=(min_value+max_value)/2;
+         res=0;
+         if(y0<=tmp) add(2*v,min_value,tmp,y0,y1,delta);
+         if((tmp<y1) && (tmp<max_value))
+	       add(2*v+1,tmp+1,max_value,y0,y1,delta);
+         correct(v,min_value,max_value);
+   }
 }
-
-int main(void)
-{
-	in = stdin; out = stdout;
-//	in = fopen("crypto.in", "rt"); out = fopen("crypto.out", "wt");
-	
-	fscanf(in, "%d", &k);
-	leftIdx = parseLong(); rightIdx = parseLong();
-	
-	Long ans = eval();
-	ans.print(); fprintf(out, "\n");
-	return 0;
+void new_edge(int y0, int y1, int delta){
+   add(1,MIN_Y,MAX_Y,y0,y1-1,delta);
 }
+void calcArr(){
+int i;
+   for(i=0; i<MAX_EDGE; i++){
+        edge[i] = sum[i] = 0;
+   }
+   area=0;
+   qsort (e, en,4*sizeof(int), comp);
+   for(i=0; i< en; i++ ) {
+      if((i>0) && (e[i][0] != e[i-1][0])) {
+        area=area+(sum[1]*(e[i][0]-e[i-1][0]));
+	  }
+	  if(i==en-1) cout<<sum[1]<<" "<<e[i-1][1]<<" "<<e[i-1][2]<<" "<<e[i-1][3]<<endl;
+      new_edge(e[i][1],e[i][2],e[i][3]);
+   }
+} // End of calcArr
+int main(){
+ inpData();
+ calcArr();
+ cout<<area<<endl;
+ return 0;
+}
+// End of File
