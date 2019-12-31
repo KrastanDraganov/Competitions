@@ -5,7 +5,7 @@
 #define MAXN 103
 using namespace std;
 int graph[MAXN][MAXN],q_front=0,q_end=0;
-pair<int,int>dirs[]={{0,-1},{0,1},{-1,0},{1,0}},q[1000005];
+pair<int,int>dirs[]={{0,-1},{0,1},{-1,0},{1,0}},q[10000005];
 void push(int v,int v2) {
     q[q_end++]={v,v2};
 }
@@ -15,7 +15,7 @@ pair<int,int> pop() {
 int size() {
     return q_end-q_front;
 }
-int bfs(int x,int y){
+int bfs(int x,int y, int n, int m){
     q_front=0;
     q_end=0;
     push(x,y);
@@ -47,7 +47,7 @@ int main(){
     for(int i=0;i<n;i++){
         for(int i2=0;i2<m;i2++){
             if(graph[i][i2]==0){
-                bfs(i,i2);
+                bfs(i,i2,n,m);
                 rez++;
             }
         }

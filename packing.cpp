@@ -13,8 +13,6 @@ int main(){
             int i2=0,first=0,last=-1;
             for(int i3=0;i3<in[i-1].size();i3++){
                 if(i2<in[i].size()){
-                   // if(i==1)
-                   //    cout<<i2<<" "<<i3<<" "<<in[i-1][i3]<<" "<<in[i][i2]<<endl;
                     if(in[i-1][i3]==in[i][i2]){
                         if(i2==0) first=i3;
                         i2++;
@@ -26,7 +24,6 @@ int main(){
                 }
             }
             if(i2>0) last=i2;
-            //cout<<first<<" "<<last<<endl;
             if(last!=-1 && last!=in[i-1].size() && in[i-1].size()-first!=in[i].size()){
                 for(int i3=last;i3<in[i].size();i3++){
                     rez+=in[i][i3];
