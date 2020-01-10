@@ -67,7 +67,7 @@ int main(){
     cin.tie(nullptr);
     int n,m;
     cin>>n>>m;
-    for(int i=1;i<=n;++i){
+    for(int i=1;i<=n+1;++i){
         depth[i]=1;
         parent[i]=i;
         graph.emplace_back();
