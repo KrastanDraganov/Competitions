@@ -6,7 +6,7 @@
 #include<queue>
 #define endl '\n'
 using namespace std;
-const int MAXN=1e5+3;
+const int MAXN=5e5+3;
 struct Edge {
     int from,to,time;
     Edge(){
@@ -24,7 +24,7 @@ struct Edge {
     }
 };
 vector<Edge> edges;
-vector<pair<int,int>> mst[MAXN];
+vector<pair<int,int>> mst[MAXN],queries;
 int parent[MAXN],depth[MAXN],max_edge[MAXN];
 bool used[MAXN];
 int find_parent(int num){
@@ -43,9 +43,10 @@ void combine(int num1, int num2){
         parent[root2]=root1;
     }
 }
-void query(int x, int y){
+void calc_bfs(int x){
     memset(used,0,sizeof(used));
     memset(max_edge,0,sizeof(max_edge));
+    max_edge[x]=-1;
     used[x]=true;
     queue<int> bfs;
     bfs.push(x);
@@ -53,17 +54,12 @@ void query(int x, int y){
         int curr=bfs.front();
         bfs.pop();
         for(pair<int,int> nextv : mst[curr]){
-            if(!max_edge[nextv.first]){
-                max_edge[nextv.first]=max(max_edge[nextv.first],nextv.second);
+            if(max_edge[nextv.first]==0){
+                max_edge[nextv.first]=max(max_edge[curr],nextv.second);
                 bfs.push(nextv.first);
-                if(nextv.first==y){
-                    cout<<max_edge[nextv.first]<<endl;
-                    return;
-                }
             }
         }
     }
-    cout<<"No paths\n";
 }
 int main(){
     ios::sync_with_stdio(false);
@@ -89,10 +85,22 @@ int main(){
     }
     int q;
     cin>>q;
-    while(q--){
+    for(int i=0;i<q;++i){
         int x,y;
         cin>>x>>y;
-        query(x,y);
+        queries.push_back({x,y});
+    }
+    sort(queries.begin(),queries.end());
+    for(int i=0;i<q;++i){
+        if((i>0 and queries[i].first!=queries[i-1].first) or !i){
+            calc_bfs(queries[i].first);
+        }
+        int res=max_edge[queries[i].second];
+        if(!res){
+            cout<<"No paths\n";
+        }else{
+            cout<<res<<endl;
+        }
     }
     cout<<endl;
 return 0;
