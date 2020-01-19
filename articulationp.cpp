@@ -6,7 +6,6 @@ const int MAXN=1e4+3;
 vector<int> graph[MAXN],res;
 bool used[MAXN],is_res[MAXN];
 int timer,in[MAXN],min_time[MAXN];
-bool is_tree;
 void dfs(int curr, int parent){
     used[curr]=true;
     int children=0;
@@ -24,7 +23,7 @@ void dfs(int curr, int parent){
             min_time[curr]=min(min_time[curr],in[nextv]);
         }
     }
-    if(parent==-1 and children>1 and !is_res[curr]){
+    if(parent==-1 && children>1 && !is_res[curr]){
         res.push_back(curr);
         is_res[curr]=true;
     }
