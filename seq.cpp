@@ -1,8 +1,11 @@
-#include<bits/stdc++.h>
-#define N 100005
+#include<iostream>
+#define endl '\n'
 using namespace std;
-int nums[N],dp[4][N];
+const int MAXN=1e5+3;
+int nums[MAXN],dp[4][MAXN];
 int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
     int n;
     cin>>n;
     for(int i=0;i<n;i++){

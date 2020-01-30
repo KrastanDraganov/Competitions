@@ -27,8 +27,8 @@ State pos[MAXN];
 vector<int> floor[MAXN];
 pair<int,int> dist[MAXN];
 
-ifstream fin("/media/fif2205/Mined/Competitions/CodeIT/2020/crossword2.in");
-ofstream fout("/media/fif2205/Mined/Competitions/CodeIT/2020/crossword.out");
+ifstream fin("crossword.in");
+ofstream fout("crossword.out");
 
 int main(){
     int t,n;
@@ -56,12 +56,16 @@ int main(){
                     dist[ind.first].second=word[i].size()-i2-1;
                 }
                 for(int i3=ind.first+1;i3<counter;++i3){
-                    for(int i4=0;i4<floor[i3].size();++i3){
+                    for(int i4=0;i4<floor[i3].size();++i4){
                         pos[floor[i3][i4]].y+=add;
                     }
                 }
-                pos[i]=State(ind.second,dist[ind.first].first-i2,VERTICAL);
                 h+=add;
+                int new_row=h;
+                for(int i3=counter-1;i3>ind.first;--i3){
+                    new_row=new_row-dist[i3].first-dist[i3].second-1;
+                }
+                pos[i]=State(ind.second,new_row-dist[ind.first].second-1-i2,VERTICAL);
                 used=true;
                 break;
             }
@@ -74,6 +78,10 @@ int main(){
             floor[counter++].push_back(i);
             w=max(w,(int)word[i].size());
         }
+        /*for(int i2=0;i2<=i;++i2){
+            cout<<"("<<pos[i2].x<<" "<<pos[i2].y<<" "<<pos[i2].orientation<<") ";
+        }
+        cout<<endl;*/
     }
     vector<vector<char>> crossword(h,vector<char>(w,'#'));
     for(int i=0;i<counter;++i){
@@ -103,6 +111,23 @@ int main(){
             fout<<(pos[i].orientation==HORIZONTAL ? "R" : "D");
         }
         fout<<endl;
+        /*bool check=true;
+        if(pos[i].orientation==HORIZONTAL){
+            for(int i3=pos[i].x;i3<word[i].size()+pos[i].x;++i3){
+                if(crossword[pos[i].y][i3]!=word[i][i3-pos[i].x]){
+                    check=false;
+                    break;
+                }
+            }
+        }else{
+            for(int i3=pos[i].y;i3<word[i].size()+pos[i].y;++i3){
+                if(crossword[i3][pos[i].x]!=word[i][i3-pos[i].y]){
+                    check=false;
+                    break;
+                }
+            }
+        }
+        cout<<"#"<<i<<": "<<(check ? "OK" : "WRONG")<<endl;*/
     }
 return 0;
 }
