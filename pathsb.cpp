@@ -1,8 +1,9 @@
 #include<iostream>
 #define endl '\n'
 using namespace std;
-const int INF=1e9;
-int dist[MAXN][MAXN],sol[MAXN][MAXN];
+const int MAXN=600,INF=1e9,MOD=1000000021;
+int dist[MAXN][MAXN];
+long long sol[MAXN][MAXN];
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
@@ -15,10 +16,10 @@ int main(){
     int n,m;
     cin>>n>>m;
     for(int i=0;i<m;++i){
-        int from,to;
-        cin>>from>>to;
-        dist[from][to]=1;
-        dist[to][from]=1;
+        int from,to,price;
+        cin>>from>>to>>price;
+        dist[from][to]=price;
+        dist[to][from]=price;
         sol[to][from]=1;
         sol[from][to]=1;
     }
@@ -27,9 +28,9 @@ int main(){
             for(int i3=1;i3<=n;++i3){
                 if(dist[i2][i]+dist[i][i3]<dist[i2][i3]){
                     dist[i2][i3]=dist[i2][i]+dist[i][i3];
-                    sol[i2][i3]=sol[i2][i]*sol[i][i3];   
+                    sol[i2][i3]=(sol[i2][i]*sol[i][i3])%MOD;   
                 }else if(dist[i2][i]+dist[i][i3]==dist[i2][i3]){
-                    sol[i2][i3]+=sol[i2][i]*sol[i][i3];  
+                    sol[i2][i3]=(sol[i2][i3]+sol[i2][i]*sol[i][i3])%MOD;  
                 }
             }
         }
@@ -39,7 +40,10 @@ int main(){
     for(int i=0;i<q;++i){
         int from,to;
         cin>>from>>to;
-        cout<<sol[from][to]<<" ";
+        if(i>0){
+            cout<<" ";
+        }
+        cout<<sol[from][to];
     }
     cout<<endl;
 return 0;

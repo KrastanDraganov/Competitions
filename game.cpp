@@ -31,7 +31,6 @@ int main(){
         dijkstra.pop();
         for(int i=0;i<graph[curr].size();i++){
             int d=graph[curr][i].first,cp=graph[curr][i].second;
-            //cout<<curr<<" "<<i<<" "<<d<<" "<<dist[curr]<<" "<<cp<<" "<<dist[d]<<endl;
             if(dist[curr]+cp<dist[d]){
                 dist[d]=dist[curr]+cp;
                 dijkstra.push({-dist[d],d});

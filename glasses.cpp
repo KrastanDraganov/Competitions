@@ -1,26 +1,25 @@
 #include<iostream>
 #define endl '\n'
 using namespace std;
-const int MAXN=1e5+3,MOD=1e6,BORDER=1000;
-int dp[MAXN][BORDER+3];
+const int MAXN=1e5+3,MOD=1e6,BORDER=1009;
+int dp[MAXN];
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     int k;
     cin>>k;
-    dp[9][0]=2;
+    dp[0]=2;
+    dp[9]=2;
+    int sum=0;
     for(int i=10;i<k;++i){
-        for(int i2=0;i2<min(i,BORDER);++i2){
-            dp[i][0]=(dp[i][0]+dp[i-10][i2])%MOD;
-            if(i2>0){
-                dp[i][i2]=dp[i-1][i2-1];
-            }
+        if(i>=BORDER){
+            sum-=dp[i-BORDER];
         }
+        sum=sum+dp[i-10];
+        sum%=MOD;
+        dp[i]=sum;
+
     }
-    int res=0;
-    for(int i=0;i<min(k,BORDER);++i){
-        res=(res+dp[k-1][i])%MOD;
-    }
-    cout<<res<<endl;
+    cout<<dp[k-1]<<endl;
 return 0;
 }

@@ -45,7 +45,9 @@ int main(){
         cin>>father>>son;
         register_id(father,id_size);
         register_id(son,id_size);
-        if(parent[code[son]]==code[father]) continue;
+        if(parent[code[son]]==code[father]){
+            continue;
+        }
         if(parent[code[son]]==0){
             parent[code[son]]=code[father];
             graph[code[father]].push_back(code[son]);
