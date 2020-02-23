@@ -4,12 +4,16 @@
 #include<queue>
 #include<unordered_map>
 #include<stack>
+
 #define endl '\n'
 #define MAXN 103
+
 using namespace std;
+
 vector<int> graph[MAXN];
 int parent[MAXN];
 unordered_map<string,bool> is_word;
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
