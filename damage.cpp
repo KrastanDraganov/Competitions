@@ -2,60 +2,76 @@
 #include<vector>
 #include<queue>
 #include<utility>
-#define MAXN 1010
+
 using namespace std;
+
+const int MAXN=1e3+3;
 const long long INF = 1e18;
-int m,n;
 pair<int,int> dirs[]={{-1,0},{1,0},{0,-1},{0,1},{-1,1},{-1,-1}};
 pair<int,int> dirs2[]={{-1,0},{1,0},{0,-1},{0,1},{1,-1},{1,1}};
-long long tiles[MAXN][MAXN],visited[MAXN][MAXN];
+long long tiles[MAXN][MAXN],dist[MAXN][MAXN];
+pair<int,int> parent[MAXN][MAXN];
+
+long long calc_dijkstra(int n, int m){
+    priority_queue<pair<long long,pair<int,int>>> dijkstra;
+    for(int i=0;i<MAXN;++i){
+        for(int i2=0;i2<MAXN;++i2){
+            dist[i][i2]=INF;
+        }
+    }
+    for(int i=0;i<n;++i){
+        dijkstra.push({-tiles[i][0],{i,0}});
+        dist[i][0]=tiles[i][0];
+        parent[i][0]={-1,-1};
+    }
+    while(!dijkstra.empty()){
+        pair<int,int> curr=dijkstra.top().second;
+        if(curr.first==-69 and curr.second==-69){
+            return -dijkstra.top().first;
+        }
+        dijkstra.pop();
+        for(int i=0;i<6;++i){
+            int newx=curr.first,newy=curr.second;
+            if(curr.first%2==1){
+                newx+=dirs[i].first;
+                newy+=dirs[i].second;
+            }else{
+                newx+=dirs2[i].first;
+                newy+=dirs2[i].second;
+            }
+            if(newx>=0 and newx<n and newy>=0 and ((newx%2==0 and newy<m) or (newx%2==1 and newy<=m))){
+                long long curr_dist=dist[curr.first][curr.second]+abs(tiles[curr.first][curr.second]-tiles[newx][newy]);
+                if(curr_dist<dist[newx][newy]){
+                    dist[newx][newy]=curr_dist;
+                    parent[newx][newy]=curr;
+                    if((newx%2==0 and newy==m-1) or (newx%2==1 and newy==m)){
+                        cout<<"start here: "<<newx<<" "<<newy<<" "<<dist[newx][newy]<<" "<<tiles[newx][newy]<<endl;
+                        while(curr!=make_pair(-1,-1)){
+                            cout<<curr.first<<" "<<curr.second<<endl;
+                            curr=parent[curr.first][curr.second];
+                        }
+                        dijkstra.push({-(dist[newx][newy]+abs(tiles[newx][newy])),{-69,-69}});
+                    }else{
+                        dijkstra.push({-dist[newx][newy],{newx,newy}});
+                    }
+                }
+            }
+        }
+    }
+    return -1;
+}
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    int m,n;
     cin>>m>>n;
     for(int i=0;i<n;++i){   
         bool one_more=(i%2==1);
         for(int i2=0;i2<m+(int)one_more;++i2){
-            cin>>tiles[i2][i];
-            //cout<<i2<<" "<<i<<" "<<tiles[i2][i]<<endl;
+            cin>>tiles[i][i2];
         }
     }
-    ++m;
-    priority_queue<pair<long long,pair<int,int>>> dijkstra;
-    for(int i=0;i<n;++i){
-        dijkstra.push({(-1)*abs(tiles[0][i]),{0,i}});
-    }
-    while(!dijkstra.empty()){
-        pair<long long,pair<int,int>> curr=dijkstra.top();
-        dijkstra.pop();
-        long long currdist=curr.first;
-        int currx=curr.second.first,curry=curr.second.second;
-        //cout<<currx<<" "<<curry<<" "<<(-1)*currdist<<endl;
-        if(currx==-69 and curry==-69){
-            cout<<(-1)*currdist<<endl;
-            break;
-        }
-        if(visited[currx][curry]){
-            continue;
-        }
-        visited[currx][curry]=true;
-        for(int i=0;i<6;++i){
-            int newx,newy;
-            if(curry%2==0){
-                newx=currx+dirs2[i].first;
-                newy=curry+dirs2[i].second;
-            }else{
-                newx=currx+dirs[i].first;
-                newy=curry+dirs[i].second;
-            }
-            if(newx>=0 and newy>=0 and newx<m and newy<n){
-                if(!visited[newx][newy]){
-                    dijkstra.push({(-1)*((-1)*currdist+abs(tiles[currx][curry]-tiles[newx][newy])),{newx,newy}});
-                }
-            }else if(newx==m){
-                dijkstra.push({(-1)*((-1)*currdist+abs(tiles[newx][newy])),{-69,-69}});
-            }
-        }
-    }
+    cout<<calc_dijkstra(n,m)<<endl;
 return 0;
 }
