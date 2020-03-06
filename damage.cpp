@@ -7,10 +7,9 @@ using namespace std;
 
 const int MAXN=1e3+3;
 const long long INF = 1e18;
-pair<int,int> dirs[]={{-1,0},{1,0},{0,-1},{0,1},{-1,1},{-1,-1}};
-pair<int,int> dirs2[]={{-1,0},{1,0},{0,-1},{0,1},{1,-1},{1,1}};
+pair<int,int> dirs[]={{-1,0},{1,0},{0,-1},{0,1},{1,-1},{-1,-1}};
+pair<int,int> dirs2[]={{-1,0},{1,0},{0,-1},{0,1},{-1,1},{1,1}};
 long long tiles[MAXN][MAXN],dist[MAXN][MAXN];
-pair<int,int> parent[MAXN][MAXN];
 
 long long calc_dijkstra(int n, int m){
     priority_queue<pair<long long,pair<int,int>>> dijkstra;
@@ -20,9 +19,12 @@ long long calc_dijkstra(int n, int m){
         }
     }
     for(int i=0;i<n;++i){
-        dijkstra.push({-tiles[i][0],{i,0}});
-        dist[i][0]=tiles[i][0];
-        parent[i][0]={-1,-1};
+        dist[i][0]=abs(tiles[i][0]);
+        if(i%2==0 and m==1){
+            dijkstra.push({-(2*dist[i][0]),{-69,-69}});
+        }else{
+            dijkstra.push({-dist[i][0],{i,0}});
+        }
     }
     while(!dijkstra.empty()){
         pair<int,int> curr=dijkstra.top().second;
@@ -43,13 +45,7 @@ long long calc_dijkstra(int n, int m){
                 long long curr_dist=dist[curr.first][curr.second]+abs(tiles[curr.first][curr.second]-tiles[newx][newy]);
                 if(curr_dist<dist[newx][newy]){
                     dist[newx][newy]=curr_dist;
-                    parent[newx][newy]=curr;
                     if((newx%2==0 and newy==m-1) or (newx%2==1 and newy==m)){
-                        cout<<"start here: "<<newx<<" "<<newy<<" "<<dist[newx][newy]<<" "<<tiles[newx][newy]<<endl;
-                        while(curr!=make_pair(-1,-1)){
-                            cout<<curr.first<<" "<<curr.second<<endl;
-                            curr=parent[curr.first][curr.second];
-                        }
                         dijkstra.push({-(dist[newx][newy]+abs(tiles[newx][newy])),{-69,-69}});
                     }else{
                         dijkstra.push({-dist[newx][newy],{newx,newy}});
