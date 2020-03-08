@@ -33,7 +33,7 @@ int calc_res(int a, int b, int n){
     calc_bfs(b,1);
     int ans=0;
     for(int i=0;i<n;++i){
-        if(i!=a and i!=b and (dist[0][i]>dist[0][b] or dist[1][i]>dist[1][a])){
+        if(i!=a and i!=b and dist[0][i]+dist[1][i]!=dist[0][b]){
             ++ans;
         }
     }
