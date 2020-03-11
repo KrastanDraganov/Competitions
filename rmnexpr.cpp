@@ -1,95 +1,173 @@
-#include<bits/stdc++.h>
+#include<iostream>
+#include<string>
+#include<stack>
+#include<vector>
+
 #define endl '\n'
+
 using namespace std;
-double rpn[10005];
-string s;
-int rpn_size=0;
-double roman_to_number(char l){
-	switch(l){
-		case 'I': return 1; break;
-		case 'V': return 2; break;
-		case 'X': return 5; break;
-		case 'L': return 50; break;
-		case 'C': return 100; break;
-		case 'D': return 500; break;
-		case 'M': return 1000; break;
-		default: return 0; break;
+
+const int MAXN=(1<<10)+3;
+bool repaired[MAXN];
+
+int value(char letter){ 
+    switch(letter){
+		case 'I':
+			return 1;
+		case 'V':
+			return 5;
+		case 'X':
+			return 10;
+		case 'L':
+			return 50;
+		case 'C':
+			return 100;
+		case 'D':
+			return 500;
+		case 'M':
+			return 1000;
+		default:
+			return -1;
+	} 
+}
+
+int priority(string sign){
+	if(sign=="*" or sign=="/"){
+		return 2;
+	}else if(sign=="+" or sign=="-"){
+		return 1;
+	}else{
+		return 0;
 	}
 }
-double sign_encoding(char sign){
-	switch(sign){
-		case '+': return -1; break;
-		case '-': return -2; break;
-		case '*': return -3; break;
-		case '/': return -4; break;
-		case '(': return -5; break;
-		case ')': return -6; break;
+
+vector<string> repair(vector<string> rpn, int ind, int limit){
+	stack<int> signs;
+	for(int i=ind;i<rpn.size() and (rpn[i][0]<'0' or rpn[i][0]>'9');++i){
+		if(rpn[i]=="+" or rpn[i]=="-"){
+			signs.push(i);
+		}
+		repaired[i]=true;
 	}
+	bool change=false;
+	while(!signs.empty()){
+		int curr=signs.top();
+		signs.pop();
+		if(signs.size()>=limit){
+			continue;
+		}
+		if(change){
+			rpn[curr]=(rpn[curr]=="+" ? "-" : "+");
+		}
+		if(rpn[curr]=="-"){
+			change=!change;
+		}
+	}
+	return rpn;
 }
-int priority(char sign){
-	if(sign=='+' or sign=='-') return 1;
-	if(sign=='/' or sign=='*') return 2;
-	if(sign=='(') return 0;
-}
-void to_rpn(){
-	stack<char>shunting_yard;
-	for(int i=0;i<s.size();i++){
-		if(s[i]==')'){
-			while(shunting_yard.top()!='('){
-				rpn[rpn_size]=sign_encoding(shunting_yard.top());
-				rpn_size++;
-				shunting_yard.pop();
-			}
-			shunting_yard.pop();
-		}else if(s[i]=='('){
-			shunting_yard.push(s[i]);
-		}else if(s[i]=='+' or s[i]=='-' or s[i]=='/' or s[i]=='*'){
-			while(!shunting_yard.empty() and (priority(shunting_yard.top())>priority(s[i]))){
-				rpn[rpn_size]=shunting_yard.top();
-				rpn_size++;
-				shunting_yard.pop();
-			}
-			shunting_yard.push(s[i]);
-		}else{
-			double number=0.0;
-			while(i<s.size() and roman_to_number(s[i])>0){
-				if(roman_to_number(s[i+1])>roman_to_number(s[i])){
-					number+=roman_to_number(s[i+1])-roman_to_number(s[i]);
-					i+=2;
+
+vector<string> to_rpn(string expression){
+	vector<string> res;
+	stack<string> yards;
+	int num=0;
+	for(int i=0;i<expression.size();++i){
+		string curr(1,expression[i]);
+		if(value(expression[i])!=-1){
+			double num=0;
+			while(i<expression.size() and value(expression[i])!=-1){
+				double curr_value=value(expression[i]);
+				if(i<expression.size()-1){
+					double next_value=value(expression[i+1]);
+					if(next_value>curr_value){
+						num+=next_value-curr_value;
+						++i;
+					}else{
+						num+=curr_value;
+					}
 				}else{
-					number+=roman_to_number(s[i]);
-					i++;
+					num+=curr_value;
+				}
+				++i;
+			}
+			--i;
+			res.push_back(to_string(num));
+		}else if(curr==")"){
+			while(yards.top()!="("){
+				res.push_back(yards.top());
+				yards.pop();
+			}
+			yards.pop();
+		}else if(curr=="("){
+			yards.push("(");
+		}else{
+			while(!yards.empty() and priority(yards.top())>priority(curr)){
+				res.push_back(yards.top());
+				yards.pop();
+			}
+			yards.push(curr);
+		}
+	}
+	while(!yards.empty()){
+		res.push_back(yards.top());
+		yards.pop();
+	}
+	return res;
+}
+
+double calc_res(vector<string> rpn){
+	stack<double> res;
+	for(int i=0;i<rpn.size();++i){
+		string curr=rpn[i];
+		cout<<curr<<" "<<(res.empty() ? -1 : res.top())<<endl;
+		if(curr[0]>='0' and curr[0]<='9'){
+			double num=0;
+			for(int i=0;i<curr.size() and curr[i]>='0' and curr[i]<='9';++i){
+				num=10*num+curr[i]-'0';
+			}
+			res.push(num);
+		}else{
+			if(!repaired[i]){
+				rpn=repair(rpn,i,res.size());
+				curr=rpn[i];
+			}
+			double num1,num2;
+			if(!res.empty()){
+				num1=res.top();
+				res.pop();
+			}else{
+				num1=0;
+			}
+			if(!res.empty()){
+				num2=res.top();
+				res.pop();
+			}else{
+				if(curr=="-"){
+					num2=2*num1;
+				}else{
+					num2=0;
 				}
 			}
-			i--;
-			rpn[rpn_size]=number;
-			rpn_size++;
+			if(curr=="+"){
+				num2+=num1;
+			}else if(curr=="-"){
+				num2-=num1;
+			}else if(curr=="*"){
+				num2*=num1;
+			}else{
+				num2/=num1;
+			}
+			res.push(num2);
 		}
 	}
+	return res.top();
 }
-double print_result(){
-	stack<double>result;
-	for(int i=0;i<rpn_size;i++){
-		if(rpn[i]>=0){
-			result.push(rpn[i]);
-		}else{
-			double x=result.top();
-			result.pop();
-			double y=result.top();
-			result.pop();
-			if(rpn[i]==-1) result.push(y+x);
-			if(rpn[i]==-2) result.push(y-x);
-			if(rpn[i]==-3) result.push(y*x);
-			if(rpn[i]==-4) result.push(y/x);
-		}
-	}
-	return result.top();
-}
+
 int main(){
 	ios::sync_with_stdio(false);
-	cin.tie(0);
-	cin>>s;
-	to_rpn();
-	cout<<print_result()<<endl;
+	cin.tie(nullptr);
+	string expression;
+	cin>>expression;
+	vector<string> rpn=to_rpn(expression);
+	cout<<calc_res(rpn)<<endl;
 return 0;
 }
