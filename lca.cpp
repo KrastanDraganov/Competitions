@@ -90,7 +90,7 @@ int main(){
         --from;
         --to;
         int curr_lca=find_lca(from,to,max_power);
-        cout<<dist[from]+dist[to]-dist[curr_lca]<<endl;
+        cout<<dist[from]+dist[to]-2*dist[curr_lca]<<endl;
     }
 return 0;
 }
