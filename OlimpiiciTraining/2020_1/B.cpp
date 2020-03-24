@@ -1,6 +1,7 @@
 #include<iostream>
 #include<algorithm>
 #include<utility>
+#include<set>
 
 #define endl '\n'
 
@@ -11,6 +12,7 @@ int res[MAXN];
 bool visited[MAXN];
 pair<long long,int> sticks[MAXN];
 pair<long long,pair<long long,int>> dist[MAXN];
+set<pair<long long,pair<long long,int>>> available;
 
 int main(){
     ios::sync_with_stdio(false);
@@ -34,31 +36,21 @@ int main(){
     }
     sort(dist,dist+n-1);
     sort(sticks,sticks+m);
-    int last=m-1;
-    for(int i=n-2;i>=0;--i){
-        int r=last,l=0;
-        /*while(sticks[ind].first>dist[i].second.first or visited[ind]){
-            --ind;
-        }*/
-        while(l<=r){
-            int mid=(l+r)/2;
-            if(sticks[mid].first>dist[i].second.first){
-                r=mid-1;
-            }else{
-                l=mid+1;
-            }
+    int ind=n-2;
+    for(int i=m-1;i>=0;--i){
+        while(ind>=0 and dist[ind].first<=sticks[i].first){
+            cout<<"a: "<<i<<" "<<dist[ind].second.second<<endl;
+            available.insert(dist[ind--]);
         }
-        int ind=l-1;
-        while(visited[ind]){
-            --ind;
+        while(!available.empty() and (*available.begin()).second.first<sticks[i].first){
+            cout<<"b: "<<i<<" "<<dist[ind].second.second<<endl;
+            available.erase(available.begin());
         }
-        visited[ind]=true;
-        if(ind==last){
-            while(visited[last]){
-                --last;
-            }
+        if(!available.empty()){
+            cout<<"c: "<<i<<" "<<(*available.begin()).second.second<<endl;
+            res[(*available.begin()).second.second]=sticks[i].second;
+            available.erase(available.begin());
         }
-        res[dist[i].second.second]=sticks[ind].second;
     }
     for(int i=0;i<n-1;++i){
         cout<<res[i]+1<<" ";

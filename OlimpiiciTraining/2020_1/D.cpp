@@ -39,8 +39,9 @@ int main(){
     for(int i=0;i<k;++i){
         int market;
         cin>>market;
+        --market;
         is_market[market]=true;
-        markets[i]={market-1,i};
+        markets[i]={market,i};
     }
     for(int i=0;i<m;++i){
         int from,to,length;
@@ -57,19 +58,19 @@ int main(){
         calc_dijkstra(i);
     }
     int res=1e9;
-    for(int i=0;i<n;++i){
-        sort(markets,markets+k);
-        if(!is_market[i]){
-            do{
+    sort(markets,markets+k);
+    do{
+        for(int i=0;i<n;++i){
+            if(!is_market[i]){
                 int curr=dist[markets[0].second][i];
-                for(int i=0;i<k-1;++i){
-                    curr+=dist[markets[i].second][markets[i+1].second];
+                for(int i2=1;i2<k;++i2){
+                    curr+=dist[markets[i2].second][markets[i2-1].first];
                 }
                 curr+=dist[markets[k-1].second][i];
                 res=min(res,curr);
-            }while(next_permutation(markets,markets+k));
+            }
         }
-    }
+    }while(next_permutation(markets,markets+k));
     cout<<res<<endl;
 return 0;
 }
