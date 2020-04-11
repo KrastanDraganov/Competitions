@@ -7,22 +7,20 @@ using namespace std;
 const int MAXN=1e5+3;
 
 struct tree_data {
-    int length,l,r,prefix,suffix,ans;
+    int length,prefix,suffix,ans;
+    bool l,r;
+    tree_data(){
+        length=1;
+        l=0;
+        r=0;
+        prefix=1;
+        suffix=1;
+        ans=1;
+    }
 };
 
 tree_data tree[4*MAXN];
-int lazy[4*MAXN];
-
-tree_data init(){
-    tree_data res;
-    res.length=1;
-    res.l=0;
-    res.r=0;
-    res.prefix=1;
-    res.suffix=1;
-    res.ans=1;
-    return res;
-}
+bool lazy[4*MAXN];
 
 tree_data combine(tree_data child1, tree_data child2){
     tree_data res;
@@ -52,12 +50,14 @@ void change(int ind){
 void push(int ind){
     change(2*ind);
     change(2*ind+1);
-    lazy[ind]=1;
+    lazy[2*ind]=!lazy[2*ind];
+    lazy[2*ind+1]=!lazy[2*ind+1];
+    lazy[ind]=false;
 }
 
 void build(int ind, int tl, int tr){
     if(tl==tr){
-        tree[ind]=init();
+        tree[ind]=tree_data();
     }else{
         int mid=(tl+tr)/2;
         build(2*ind,tl,mid);
@@ -66,21 +66,23 @@ void build(int ind, int tl, int tr){
     }
 }
 
-void update(int ind, int tl, int tr, int l, int r, int val){
+void update(int ind, int tl, int tr, int l, int r){
     if(r<tl or l>tr or l>r){
         return;
     }
     if(tl==l and tr==r){
         //cout<<"change: "<<l<<" "<<r<<endl;
         change(ind);
-        lazy[ind]*=val;
+        lazy[ind]=!lazy[ind];
     }else{
-        if(lazy[ind]!=1){
+        if(lazy[ind] and tl!=tr){
             push(ind);
+        }else{
+            lazy[ind]=0;
         }
         int mid=(tl+tr)/2;
-        update(2*ind,tl,mid,l,min(mid,r),val);
-        update(2*ind+1,mid+1,tr,max(mid+1,l),r,val);
+        update(2*ind,tl,mid,l,min(mid,r));
+        update(2*ind+1,mid+1,tr,max(mid+1,l),r);
         tree[ind]=combine(tree[2*ind],tree[2*ind+1]);
         //cout<<tl<<" "<<tr<<" "<<tree[ind].ans<<endl;
     }
@@ -89,10 +91,6 @@ void update(int ind, int tl, int tr, int l, int r, int val){
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
-
-    for(int i=0;i<4*MAXN;++i){
-        lazy[i]=1;
-    }
 
     int n,q;
     cin>>n>>q;
@@ -106,7 +104,7 @@ int main(){
         }else{
             int l,r;
             cin>>l>>r;
-            update(1,0,n-1,l,r,-1);
+            update(1,0,n-1,l,r);
             //cout<<tree[1].ans<<endl;
         }
     }
