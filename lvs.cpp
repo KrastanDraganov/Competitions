@@ -45,13 +45,12 @@ tree_data combine(tree_data child1, tree_data child2){
 void change(int ind){
     tree[ind].l=!tree[ind].l;
     tree[ind].r=!tree[ind].r;
+    lazy[ind]=!lazy[ind];
 }
 
 void push(int ind){
     change(2*ind);
     change(2*ind+1);
-    lazy[2*ind]=!lazy[2*ind];
-    lazy[2*ind+1]=!lazy[2*ind+1];
     lazy[ind]=false;
 }
 
@@ -71,9 +70,7 @@ void update(int ind, int tl, int tr, int l, int r){
         return;
     }
     if(tl==l and tr==r){
-        //cout<<"change: "<<l<<" "<<r<<endl;
         change(ind);
-        lazy[ind]=!lazy[ind];
     }else{
         if(lazy[ind] and tl!=tr){
             push(ind);
@@ -84,7 +81,6 @@ void update(int ind, int tl, int tr, int l, int r){
         update(2*ind,tl,mid,l,min(mid,r));
         update(2*ind+1,mid+1,tr,max(mid+1,l),r);
         tree[ind]=combine(tree[2*ind],tree[2*ind+1]);
-        //cout<<tl<<" "<<tr<<" "<<tree[ind].ans<<endl;
     }
 }
 
@@ -105,7 +101,6 @@ int main(){
             int l,r;
             cin>>l>>r;
             update(1,0,n-1,l,r);
-            //cout<<tree[1].ans<<endl;
         }
     }
 return 0;
