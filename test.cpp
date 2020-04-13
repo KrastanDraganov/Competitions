@@ -5,7 +5,7 @@
 
 using namespace std;
 
-const int MAXN=1003;
+const int MAXN=10003;
 vector<int> graph[MAXN];
 int lca[MAXN][32],depth[MAXN];
 
