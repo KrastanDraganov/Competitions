@@ -2,15 +2,21 @@
 #include<cstring>
 #include<queue>
 #include<utility>
+
 #define endl '\n'
+
 using namespace std;
+
 const int MAXS=900,MAXP=8100;
 int dp[MAXS+3][MAXP+3],last_digit[MAXS+3][MAXP+3];
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    
     memset(dp,-1,sizeof(dp));
     memset(last_digit,-1,sizeof(last_digit));
+    
     queue<pair<int,int>> bfs;
     bfs.push({0,0});
     dp[0][0]=0;
@@ -27,6 +33,7 @@ int main(){
             }
         }
     }
+    
     int tests;
     cin>>tests;
     while(tests--){
@@ -36,7 +43,7 @@ int main(){
             cout<<"No solution\n";
         }else{
             string res="";
-            while(s and p){
+            while(s>0 and p>0){
                 int curr=last_digit[s][p];
                 char attach='0'+curr;
                 res=attach+res;

@@ -1,53 +1,47 @@
-#include <cstdio>
-#include<iostream>
-#include <algorithm>
+#include<cstdio>
+#include<deque>
 using namespace std;
 
-const int N_max=200020;
-struct point {int x; int v;};
-point a[N_max];
-int n;
+int N, L;
+char S[int(1e7) + 2];
 
-bool cmp(point a, point b)
-{ if(a.x < b.x)return true;
-  if(a.x > b.x)return false;
-  if(a.v < b.v)return true;
-  return false;
-}
+long long ans = 0;
 
-int main()
-{
-  scanf("%d",&n);
-  n=2*n;
-  for(int i=0;i<n/2;i++)
-   {scanf("%d", &a[2*i].x); a[2*i].v=1;
-    scanf("%d", &a[2*i+1].x); a[2*i+1].v=-1;
-   }
+// if step==+1: then iterate [x, x+1, ..., end-1]
+// if step==-1: then iterate [x, x-1, ..., end+1]
+void solve(int x, int end, int step) {
+  deque<int> D;
 
-  sort(a, a+n, cmp);
+  for(; ; x+=step) {
+    // crop dist to L
+    while (!D.empty() && step * (x - D.back()) > L)
+      D.pop_back();
 
-int d=0;
-int m=0;
-for(int i=0;i<n;i++)
-{
-  d += a[i].v;
-  if(m<d) m=d;
-  cout<<a[i].x<<" "<<(a[i].v==1 ? "B" : "E")<<" "<<d<<endl;
-}
+    // add traverses from to x
+    ans += D.size();
 
-int s=0;
-d=0;
-int last=a[0].x-1;
-for(int i=0;i<n;i++)
-{
-  d += a[i].v;
-  if(d==m)
-  {
-    s = s + a[i+1].x-a[i].x+1;
-    if(a[i].x==last) s--;
+    if (x == end)
+      break;
 
-    last=a[i+1].x;
+    if ((S[x] == '-') == (step == +1))
+      // add the current point if descending follows 
+      D.push_front(x);
+    else
+      if (!D.empty())
+        // delete the last (descending) point if ascending follows
+        D.pop_front();
   }
 }
-printf("%d\n",s);
+
+int main() {
+  scanf("%d%d", &N, &L);
+  scanf("%s", S);
+
+  solve(0, N, +1);    // left -> right
+  solve(N-1, -1, -1); // right -> left
+
+  printf("%lld\n", ans);
+
+  return 0;
 }
+
