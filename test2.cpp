@@ -1,47 +1,61 @@
+//task: hexgame
+//author: Tsvetan Angelov
 #include<cstdio>
-#include<deque>
+#include<iostream>
 using namespace std;
 
-int N, L;
-char S[int(1e7) + 2];
+const int INF = 300010;
 
-long long ans = 0;
-
-// if step==+1: then iterate [x, x+1, ..., end-1]
-// if step==-1: then iterate [x, x-1, ..., end+1]
-void solve(int x, int end, int step) {
-  deque<int> D;
-
-  for(; ; x+=step) {
-    // crop dist to L
-    while (!D.empty() && step * (x - D.back()) > L)
-      D.pop_back();
-
-    // add traverses from to x
-    ans += D.size();
-
-    if (x == end)
-      break;
-
-    if ((S[x] == '-') == (step == +1))
-      // add the current point if descending follows 
-      D.push_front(x);
-    else
-      if (!D.empty())
-        // delete the last (descending) point if ascending follows
-        D.pop_front();
-  }
+int min(int a, int b, bool &f)
+{
+	if (b < a) 
+	{
+		f = true; 
+		return b;
+	}
+	return a;
 }
 
-int main() {
-  scanf("%d%d", &N, &L);
-  scanf("%s", S);
+int main()
+{
+	int res[2][6] = { 0 }, n, hexagon[6];
+	scanf("%d", &n);
+	for (int i = 0; i < n; i++)
+	{
+		bool flag = false;
 
-  solve(0, N, +1);    // left -> right
-  solve(N-1, -1, -1); // right -> left
+		for (int j = 0; j < 6; j++)
+		{
+			scanf("%d", &hexagon[j]);
+			res[1][j] = INF;
+		}
+			
+		for (int j = 3; j < 6; j++)
+		{
+			res[1][hexagon[j]] = min(res[1][hexagon[j]], res[0][hexagon[j - 3]] + j - 3, flag);
+			res[1][hexagon[j - 3]] = min(res[1][hexagon[j - 3]], res[0][hexagon[j]] + 6 - j, flag);
+		}
 
-  printf("%lld\n", ans);
+		if (!flag)
+		{
+			printf("NO %d\n", i+1);
+			return 0;
+		}
+    if(i==0){
+      for(int i2=0;i2<6;++i2){
+        cout<<res[1][i2]<<" ";
+      }
+      cout<<endl;
+    }
+		for (int j = 0; j < 6; j++)
+			res[0][j] = res[1][j];
+	}
 
-  return 0;
+	int ans = INF;
+	for (int i = 0; i < 6; i++)
+		if (res[0][i] < ans)
+			ans = res[0][i];
+
+	printf("%d\n", ans);
+	return 0;
 }
-
