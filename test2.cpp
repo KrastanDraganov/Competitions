@@ -1,61 +1,114 @@
-//task: hexgame
-//author: Tsvetan Angelov
-#include<cstdio>
-#include<iostream>
-using namespace std;
+class LRUNode{
+public:
+    int key;
+    int value;
+    LRUNode * prev;
+    LRUNode * next;
+};
 
-const int INF = 300010;
 
-int min(int a, int b, bool &f)
-{
-	if (b < a) 
-	{
-		f = true; 
-		return b;
-	}
-	return a;
-}
+class LRUCache {
 
-int main()
-{
-	int res[2][6] = { 0 }, n, hexagon[6];
-	scanf("%d", &n);
-	for (int i = 0; i < n; i++)
-	{
-		bool flag = false;
-
-		for (int j = 0; j < 6; j++)
-		{
-			scanf("%d", &hexagon[j]);
-			res[1][j] = INF;
-		}
-			
-		for (int j = 3; j < 6; j++)
-		{
-			res[1][hexagon[j]] = min(res[1][hexagon[j]], res[0][hexagon[j - 3]] + j - 3, flag);
-			res[1][hexagon[j - 3]] = min(res[1][hexagon[j - 3]], res[0][hexagon[j]] + 6 - j, flag);
-		}
-
-		if (!flag)
-		{
-			printf("NO %d\n", i+1);
-			return 0;
-		}
-    if(i==0){
-      for(int i2=0;i2<6;++i2){
-        cout<<res[1][i2]<<" ";
-      }
-      cout<<endl;
+public:
+    unordered_map<int,LRUNode*> m_map;
+    LRUNode * m_root;
+    int m_capacity;
+    LRUCache(int capacity) {
+        m_capacity = capacity;
+        m_root = nullptr;
     }
-		for (int j = 0; j < 6; j++)
-			res[0][j] = res[1][j];
-	}
 
-	int ans = INF;
-	for (int i = 0; i < 6; i++)
-		if (res[0][i] < ans)
-			ans = res[0][i];
+    inline LRUNode * findNode(int key )
+    {
+        auto it = m_map.find(key);
+        return (it != m_map.end())? it->second : nullptr;
+    }
 
-	printf("%d\n", ans);
-	return 0;
-}
+    inline void moveNodeToHead(LRUNode * node)
+    {
+        // if node is head exit (nothing to do)
+        if ( node == m_root)
+            return;
+
+        // remove node from list. stitching up list
+        // if there is a prev link then its an exiting node
+        if ( node->prev )
+        {
+            node->prev->next = node->next;
+            node->next->prev = node->prev;
+        }
+
+        // connect node to head
+        node->next = m_root;
+        node->prev = m_root->prev;
+        m_root->prev->next = node;
+        m_root->prev = node;
+        m_root = node;
+    }
+
+    int get(int key) {
+        LRUNode * node = findNode(key);
+
+        if (!node)
+            return -1;
+
+        moveNodeToHead(node);
+
+        return m_root->value;
+    }
+
+
+    void put(int key, int value) {
+        // find key
+        LRUNode * node = findNode(key);
+
+        // if key found move to front and change value
+        if(node) {
+            moveNodeToHead(node);
+            node->value = value;
+        } else {
+            // check if at cap. if so use oldest node as
+            // new node. remove from hash table
+            // else create new node
+            if( m_map.size() >= m_capacity)
+            {
+                m_map.erase(m_root->prev->key);
+
+                node = m_root->prev;
+                node->key = key;
+                node->value = value;
+           } else {
+                node = new LRUNode;
+                node->key = key;
+                node->value = value;
+                if ( !m_root )
+                {
+                    m_root = node;
+                    m_root->next = m_root;
+                    m_root->prev = m_root;
+                } else {
+                    node->next = m_root;
+                    node->prev = m_root->prev;
+                    node->prev->next = node;
+                    m_root->prev = node;
+                }
+
+           }
+
+
+            // add to hash map and set nodes value
+            m_map[key] = node;
+            m_root = node;
+        }
+
+        return;
+    }
+
+};
+
+auto speedup=[](){
+    std::ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+    return nullptr;
+}();
