@@ -7,6 +7,18 @@ using namespace std;
 const int MAXN=1e6+3;
 int unitA[MAXN],unitB[MAXN],real_ind[MAXN];
 
+void print_untis(int n){
+    cout<<"-------------\n";
+    for(int i=0;i<n;++i){
+        cout<<unitA[i]<<" ";
+    }
+    cout<<endl;
+    for(int i=0;i<n;++i){
+        cout<<unitB[i]<<" ";
+    }
+    cout<<"\n-------------\n";
+}
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
@@ -27,6 +39,7 @@ int main(){
     }
     for(int i=0;i<k;++i){
         cout<<timer<<endl;
+        //print_untis(n);
         if(i<k-1){
             int l,r;
             cin>>l>>r;
@@ -51,6 +64,9 @@ int main(){
                 timer+=max(unitB[r],unitA[l+1]);
                 timer-=max(unitA[r],unitB[r-1]);
                 timer+=max(unitA[l],unitB[r-1]);
+            }else{
+                timer-=max(unitB[l],unitA[r]);
+                timer+=max(unitB[r],unitA[l]);
             }
             swap(unitA[l],unitA[r]);
             swap(unitB[l],unitB[r]);
