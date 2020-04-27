@@ -1,9 +1,13 @@
 #include<iostream>
 #include<vector>
 #include<algorithm>
+
 #define endl '\n'
+
 using namespace std;
+
 const long long BORDER = 9876543210;
+
 bool check(vector<int> digits, int counter, int used){
     int curr=10;
     for(int i=digits.size()-counter;i<digits.size();++i){
@@ -21,6 +25,7 @@ bool check(vector<int> digits, int counter, int used){
     }
     return false;
 }
+
 long long next_num(long long x){
     if(x==0){
         return 1;
@@ -69,9 +74,11 @@ long long next_num(long long x){
         }
     }
 }
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    
     int q;
     cin>>q;
     for(int i=0;i<q;++i){

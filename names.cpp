@@ -1,14 +1,19 @@
 #include<iostream>
 #include<cstring>
+
 #define endl '\n'
+
 using namespace std;
+
+string input,res;
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    
     int n;
-    cin>>n;
-    string input,res;
-    cin>>input;
+    cin>>n>>input;
+    
     res=input;
     int counter=1;
     for(int i=1;i<n;++i){
