@@ -1,12 +1,16 @@
 #include<iostream>
-#include<queue>
-#include<functional>
-#include<vector>
-#include<utility>
 
 #define endl '\n'
 
 using namespace std;
+
+const int MAXN=1e5+3,LIMIT=6e3;
+int heights[MAXN];
+long long prefix[MAXN],dp[MAXN];
+
+long long sum(int x, int y){
+    return prefix[y+1]-prefix[x];
+}
 
 int main(){
     ios::sync_with_stdio(false);
@@ -14,25 +18,33 @@ int main(){
 
     int n,k;
     cin>>n>>k;
-    int prev=-1;
-    priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>> diffs;
     for(int i=0;i<n;++i){
-        int curr;
-        cin>>curr;
-        if(i>0 and curr!=prev){
-            diffs.push({curr-prev,i-1});
+        cin>>heights[i];
+    }
+
+    for(int i=0;i<n;++i){
+        prefix[i+1]=prefix[i]+heights[i];
+    }
+    for(int i=1;i<n;++i){
+        int med=i/2;
+        long long price1=heights[med]*med-sum(0,med-1);
+        long long price2=sum(med+1,i)-heights[med]*(i-med);
+        dp[i]=price1+price2;
+        //cout<<"pre: "<<dp[i]<<" "<<price1<<" "<<price2<<" "<<med<<endl;
+    }
+    if(n<=LIMIT){
+        for(int i=1;i<n;++i){
+            //cout<<i<<endl;
+            for(int i2=0;i2<i;++i2){
+                int med=(i+i2+1)/2;
+                long long price1=heights[med]*(med-i2-1)-sum(i2+1,med-1);
+                long long price2=sum(med+1,i)-heights[med]*(i-med);
+                //cout<<dp[i2]<<" "<<price1<<" "<<price2<<endl;
+                dp[i]=min(dp[i],dp[i2]+price1+price2+k);
+            }
+            //cout<<"res: "<<dp[i]<<endl;
         }
-        prev=curr;
     }
-    
-    long long res=0;
-    while(!diffs.empty() and diffs.top().first<k){
-        res+=(long long)diffs.top().first;
-        diffs.pop();
-    }
-    if(!diffs.empty()){
-        res+=(long long)diffs.size()*k;
-    }
-    cout<<res<<endl;
+    cout<<dp[n-1]<<endl;
 return 0;
 }
