@@ -2,12 +2,16 @@
 #include<queue>
 #include<cstring>
 #include<utility>
+
 #define endl '\n'
 #define MAXN 53
+
 using namespace std;
+
 pair<int,int> dirs[4]={{0,-1},{0,1},{-1,0},{1,0}};
 string table[MAXN];
 bool used[MAXN][MAXN][MAXN];
+
 struct Vertex {
     int row,col,ind;
     Vertex(){}
@@ -17,9 +21,11 @@ struct Vertex {
         ind=_ind;
     }
 };
+
 bool ans(string s, int n, int m){
     memset(used,0,sizeof(used));
     queue<Vertex> bfs;
+    
     for(int i=0;i<n;++i){
         for(int i2=0;i2<m;++i2){
             if(table[i][i2]==s[0]){
@@ -31,6 +37,7 @@ bool ans(string s, int n, int m){
             }
         }
     }
+    
     while(!bfs.empty()){
         Vertex curr=bfs.front();
         bfs.pop();
@@ -49,14 +56,17 @@ bool ans(string s, int n, int m){
     }
     return false;
 }
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    
     int n,m;
     cin>>n>>m;
     for(int i=0;i<n;++i){
         cin>>table[i];
     }
+    
     int k;
     cin>>k;
     for(int i=0;i<k;++i){
