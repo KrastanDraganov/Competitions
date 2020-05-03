@@ -7,7 +7,8 @@ using namespace std;
 
 const int MAXN=5e4+3,MAXK=503;
 vector<int> graph[MAXN];
-int dp[MAXN][MAXK],parent[MAXN];
+int parent[MAXN];
+long long dp[MAXN][MAXK];
 
 void dfs(int currv, int prev, int k){
     dp[currv][0]=1;
@@ -38,9 +39,9 @@ int main(){
     }
 
     dfs(0,-1,k);
-    int res=0;
+    long long res=0;
     for(int currv=0;currv<n;++currv){
-        int curr=0;
+        long long curr=0;
         for(int nextv : graph[currv]){
             if(nextv!=parent[currv]){
                 for(int i=0;i<k-1;++i){
