@@ -12,12 +12,18 @@ int main(){
     string s;
     cin>>s;
 
-    int res=0,pos=0;
-    for(int i=0;i<s.size();++i){
-        if(s[i]=='B'){
-            res+=abs(pos-i);
-            pos+=2;
+    int villages=0,cities=0;
+    for(char curr : s){
+        if(curr=='V'){
+            ++villages;
+        }else{
+            ++cities;
         }
+    }
+
+    int res=2*min(villages,cities);
+    if(villages!=cities){
+        ++res;
     }
     cout<<res<<endl;
 return 0;
