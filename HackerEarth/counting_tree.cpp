@@ -14,7 +14,6 @@ int mul(int num1, int num2){
 }
 
 void dfs(int currv, int parent){
-    dp[currv][0]=1;
     dp[currv][weights[currv]]=1;
     for(int nextv : graph[currv]){
         if(nextv!=parent){
@@ -22,6 +21,19 @@ void dfs(int currv, int parent){
             for(int i=weights[currv];i<=k;++i){
                 dp[currv][i]=(dp[currv][i]+dp[nextv][i-weights[currv]])%MOD;
             }
+        }
+    }
+}
+
+void dfs2(int currv, int parent){
+    if(parent!=-1){
+        for(int i=weights[currv];i<=k;++i){
+            dp[currv][i]=(dp[currv][i]+dp[parent][i-weights[currv]])%MOD;
+        }
+    }
+    for(int nextv : graph[currv]){
+        if(nextv!=parent){
+            dfs2(nextv,currv);
         }
     }
 }
@@ -52,6 +64,7 @@ int main(){
         }
 
         dfs(0,-1);
+        dfs2(0,-1);
         int res=0;
         for(int i=0;i<n;++i){
             cout<<i<<": "<<dp[i][k]<<endl;
