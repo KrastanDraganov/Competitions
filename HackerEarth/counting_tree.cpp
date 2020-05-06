@@ -7,7 +7,7 @@ using namespace std;
 
 const int MAXN=5e4+3,MAXK=103,MOD=1e9+7;
 vector<int> graph[MAXN];
-int k,weights[MAXN],dp[MAXN][MAXK];
+int k,weights[MAXN],curr[MAXK],dp[MAXN][MAXK];
 
 int mul(int num1, int num2){
     return (long long) num1*num2%MOD;
@@ -18,22 +18,17 @@ void dfs(int currv, int parent){
     for(int nextv : graph[currv]){
         if(nextv!=parent){
             dfs(nextv,currv);
-            for(int i=weights[currv];i<=k;++i){
-                dp[currv][i]=(dp[currv][i]+dp[nextv][i-weights[currv]])%MOD;
+            for(int i=0;i<=k;++i){
+                curr[i]=0;
             }
-        }
-    }
-}
-
-void dfs2(int currv, int parent){
-    if(parent!=-1){
-        for(int i=weights[currv];i<=k;++i){
-            dp[currv][i]=(dp[currv][i]+dp[parent][i-weights[currv]])%MOD;
-        }
-    }
-    for(int nextv : graph[currv]){
-        if(nextv!=parent){
-            dfs2(nextv,currv);
+            for(int i=0;i<=k;++i){
+                for(int i2=0;i2+i<=k;++i2){
+                    curr[i+i2]=(curr[i+i2]+mul(dp[currv][i],dp[nextv][i2]))%MOD;
+                }
+            }
+            for(int i=0;i<=k;++i){
+                dp[currv][i]=(dp[currv][i]+curr[i])%MOD;
+            }
         }
     }
 }
@@ -64,13 +59,11 @@ int main(){
         }
 
         dfs(0,-1);
-        dfs2(0,-1);
-        int res=0;
+        int ans=0;
         for(int i=0;i<n;++i){
-            cout<<i<<": "<<dp[i][k]<<endl;
-            res=(res+dp[i][k])%MOD;
+            ans=(ans+dp[i][k])%MOD;
         }
-        cout<<res<<endl;
+        cout<<ans<<endl;
     }
 return 0;
 }

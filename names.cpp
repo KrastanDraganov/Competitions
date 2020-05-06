@@ -5,27 +5,26 @@
 
 using namespace std;
 
-string input,res;
+const int MAXN=11;
+char input[MAXN],res[MAXN];
 
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
     
     int n;
-    cin>>n>>input;
+    cin>>n;
     
-    res=input;
-    int counter=1;
-    for(int i=1;i<n;++i){
+    int counter=0;
+    for(int i=0;i<n;++i){
         cin>>input;
-        if(input==res){
+        if(strcmp(input,res)==0){
             ++counter;
+        }else if(counter==0){
+            strcpy(res,input);
+            counter=1;
         }else{
             --counter;
-            if(counter==0){
-                res=input;
-                counter=1;
-            }
         }
     }
     cout<<res<<endl;
