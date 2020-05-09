@@ -1,4 +1,5 @@
 #include<iostream>
+#include<string>
 
 #define endl '\n'
 
@@ -20,25 +21,27 @@ int main(){
         int n0,n1,n2;
         cin>>n0>>n1>>n2;
         repair(n0);
-        repair(n1);
         repair(n2);
+        
+        string res="";
         for(int i=0;i<n2;++i){
-            cout<<"1";
+            res+="1";
         }
         if(n2>0 and n0>0){
-            n1-=2;
+            --n1;
         }
         for(int i=0;i<n0;++i){
-            cout<<"0";
+            res+="0";
         }
+        if(res.empty()){
+            res+="1";
+        }
+        char curr=(res.back()=='0' ? '1' : '0');
         for(int i=0;i<n1;++i){
-            if(i%2==0){
-                cout<<"1";
-            }else{
-                cout<<"0";
-            }
+            res+=curr;
+            curr=(curr=='1' ? '0' : '1');
         }
-        cout<<endl;
+        cout<<res<<endl;
     }
 return 0;
 }
