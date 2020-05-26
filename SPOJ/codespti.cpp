@@ -1,5 +1,6 @@
 #include<iostream>
 #include<vector>
+#include<utility>
 
 #define endl '\n'
 
@@ -8,31 +9,25 @@ using namespace std;
 const int MAXN=1e4+3;
 vector<int> graph[MAXN];
 
-//<needed extra robots,max depth>
 pair<int,int> dfs(int currv, int parent){
-    int robots=0,normal=0,max_depth=0;
-    bool is_left=true,is_larger=false;
+    int counter[3]={0},robots=0,type=-1;
     for(int nextv : graph[currv]){
         if(nextv!=parent){
             pair<int,int> info=dfs(nextv,currv);
             robots+=info.first;
-            int depth=info.second+1;
-            if(depth>1){
-                if(normal==0){
-                    is_left=!is_left;
-                }
-                robots+=is_larger;
-                is_larger=true;
-                normal=0;
-            }else{
-                ++normal;
-            }
-            max_depth=max(max_depth,depth);
+            ++counter[info.second];
         }
     }
-    robots+=(is_left and is_larger and normal>0);
-    //cout<<currv<<" "<<robots<<" "<<max_depth<<endl;
-    return {robots,max_depth};
+    robots+=(counter[2]/2);
+    if(counter[2]%2==1 or (counter[1]>0 and counter[2]==0)){
+        type=2;
+    }else{
+        type=(counter[2]>0 ? 0 : 1);
+    }
+    if(parent==-1 and type==2){
+        ++robots;
+    }
+    return {robots,type};
 }
 
 int main(){
@@ -54,7 +49,7 @@ int main(){
             graph[to].push_back(from);
         }
 
-        cout<<1+dfs(0,-1).first<<endl;
+        cout<<dfs(0,-1).first<<endl;
     }
 return 0;
 }
