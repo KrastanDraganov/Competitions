@@ -1,35 +1,42 @@
 #include<iostream>
 #include<vector>
-#include<algorithm>
 
 #define endl '\n'
 
 using namespace std;
 
 const int MAXN=5e4+3;
-vector<int> graph[MAXN],leaves;
-int timer,in[MAXN],out[MAXN],dist[MAXN];
+vector<int> graph[MAXN],barns;
+int farthest[MAXN],barn[MAXN];
 
-void dfs(int currv, int parent){
-    if(parent!=-1){
-        dist[currv]=dist[parent]+1;
-    }
-    in[currv]=timer++;
-    bool is_leaf=true;
-    for(int nextv : graph[currv]){
-        if(nextv!=parent){
-            is_leaf=false;
-            dfs(nextv,currv);
+int dfs(int currv, int parent, int max_dist){
+    if(currv==0){
+        barns.clear();
+        for(int i=0;i<MAXN;++i){
+            farthest[i]=0;
+            barn[i]=MAXN;
         }
     }
-    out[currv]=timer++;
-    if(is_leaf){
-        leaves.push_back(currv);
-    }
-}
 
-bool cmp(int node1, int node2){
-    return dist[node1]>dist[node2];
+    int counter=0;
+    for(int nextv : graph[currv]){
+        if(nextv!=parent){
+            counter+=dfs(nextv,currv,max_dist);
+            farthest[currv]=max(farthest[currv],farthest[nextv]+1);
+            barn[currv]=min(barn[currv],barn[nextv]+1);
+        }
+    }
+
+    if(farthest[currv]+barn[currv]<=max_dist){
+        farthest[currv]=-1;
+    }
+    if((currv==0 and farthest[currv]!=-1) or farthest[currv]>=max_dist){
+        ++counter;
+        barns.push_back(currv);
+        barn[currv]=0;
+        farthest[currv]=-1;
+    }
+    return counter;
 }
 
 int main(){
@@ -47,22 +54,28 @@ int main(){
         graph[to].push_back(from);
     }
 
-    dfs(0,-1);
-    sort(leaves.begin(),leaves.end(),cmp);
-    int min_dist=1e9,pos=-1;
-    for(int i=0;i<n;++i){
-        int curr=0;
-        if(in[i]<=in[leaves[0]] and out[leaves[0]]<=out[i]){
-            curr=max(curr,dist[leaves[0]]-dist[i]);
-            curr=max(curr,dist[i]+dist[leaves[1]]);
+    int l=0,r=n-1;
+    while(l<=r){
+        int mid=(l+r)/2;
+        if(dfs(0,-1,mid)<=m){
+            r=mid-1;
         }else{
-            curr=max(curr,dist[i]+dist[leaves[0]]);
-        }
-        if(curr<min_dist){
-            min_dist=curr;
-            pos=i+1;
+            l=mid+1;
         }
     }
-    cout<<min_dist<<endl<<pos<<endl;
+
+    int res=r+1;
+    dfs(0,-1,res);
+    for(int i=0;i<n and barns.size()<m;++i){
+        if(barn[i]!=0){
+            barns.push_back(i);
+        }
+    }
+
+    cout<<res<<endl;
+    for(int curr : barns){
+        cout<<curr+1<<" ";
+    }
+    cout<<endl;
 return 0;
 }
