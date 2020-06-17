@@ -25,10 +25,19 @@ int main(){
         }
         
         int res=0;
-        for(int i=0;i<26;++i){
-            res+=counter[i];
-            if(counter[i]%2==1){
-                --res;
+        for(int div=1;div<=k;++div){
+            if(k%div!=0){
+                continue;
+            }
+            for(int groups=1;true;++groups){
+                int curr=0;
+                for(int i=0;i<26;++i){
+                    curr+=(counter[i]/groups);
+                }
+                if(curr<div){
+                    break;
+                }
+                res=max(res,groups*div);
             }
         }
         cout<<res<<endl;
