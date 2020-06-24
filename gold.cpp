@@ -1,36 +1,41 @@
-#include<bits/stdc++.h>
+#include<iostream>
+#include<algorithm>
+
 #define endl '\n'
+
 using namespace std;
-int weight[53],n,sum;
-pair<bool,int> dp[53][50003];
-bool is_used[53][50003];
-pair<bool,int> sol(int i,int counter){
-    if(counter>25000 or (i==n and counter>0)) return {0,0};
-    else if(i==n and counter==0) return {1,0};
-    if(is_used[i][counter]) return dp[i][counter];
-    is_used[i][counter]=true;
-    if(weight[i]>counter){
-        dp[i][counter]=sol(i+1,weight[i]-counter);
-        dp[i][counter].second+=weight[i]-counter;
-    }else{
-        dp[i][counter]=sol(i+1,counter-weight[i]);
-    }
-    pair<bool,int> check=sol(i+1,counter);
-    dp[i][counter]=max(dp[i][counter],check);
-    check=sol(i+1,counter+weight[i]);
-    check.second+=weight[i];
-    dp[i][counter]=max(dp[i][counter],check);
-    //cout<<boolalpha<<dp[i][counter].first<<" "<<dp[i][counter].second<<endl;
-    return dp[i][counter];
-}
+
+const int MAXN=53,MAXS=5e4+3;
+int weights[MAXN],dp[MAXN][MAXS];
+
 int main(){
     ios::sync_with_stdio(false);
-    cin.tie(0);
+    cin.tie(nullptr);
+
+    int n;
     cin>>n;
-    for(int i=0;i<n;i++){
-        cin>>weight[i];
-        sum+=weight[i];
+    int all=0;
+    for(int i=0;i<n;++i){
+        cin>>weights[i];
+        all+=weights[i];
     }
-    cout<<sum-2*sol(0,0).second<<endl;
+
+    for(int i=0;i<MAXN;++i){
+        for(int i2=0;i2<MAXS;++i2){
+            dp[i][i2]=1e9;
+        }
+    }
+
+    dp[0][0]=weights[0];
+    dp[0][weights[0]]=0;
+    for(int i=1;i<n;++i){
+        for(int sum=0;sum<=all;++sum){
+            dp[i][sum]=min(dp[i][sum],dp[i-1][sum]+weights[i]);
+            int new_sum1=abs(sum-weights[i]),new_sum2=sum+weights[i];
+            dp[i][new_sum1]=min(dp[i][new_sum1],dp[i-1][sum]);
+            dp[i][new_sum2]=min(dp[i][new_sum2],dp[i-1][sum]);
+        }
+    }
+    cout<<dp[n-1][0]<<endl;
 return 0;
 }
