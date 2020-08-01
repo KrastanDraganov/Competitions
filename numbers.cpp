@@ -1,64 +1,83 @@
-#include<bits/stdc++.h>
+#include<iostream>
+#include<algorithm>
+
 #define endl '\n'
+
 using namespace std;
-const int MAXN=2*1e5+2;
-pair<int,pair<int,int>> tree[4*MAXN];
-int nums[MAXN],l,r,ans1,ans2,ans3;
-void find_answers(int ind,int tbegin,int tend){
-    int mid=(tbegin+tend)/2;
-    if(l<=tbegin and tend<=r){
-        if(tree[ind].first==ans1){
-            ans2+=tree[ind].second.first;
-        }else if(tree[ind].first<ans1){
-            ans2=tree[ind].second.first;
-        }
-        ans1=min(ans1,tree[ind].first);
-        ans3=__gcd(ans3,tree[ind].second.second);
+
+const int MAXN=2e5+3;
+int nums[MAXN];
+
+struct Query {
+     int num,counter,gcd;
+    
+    Query(){
+        num=1e9;
+        counter=0;
+        gcd=0;
+    }
+} tree[4*MAXN];
+
+void build_tree(int ind, int tl, int tr){
+    if(tl==tr){
+        tree[ind].num=tree[ind].gcd=nums[tl];
+        tree[ind].counter=1;
         return;
     }
-    if(l<=mid){
-        find_answers(2*ind,tbegin,mid);
-    }
-    if(r>mid){
-        find_answers(2*ind+1,mid+1,tend);
+    int mid=(tl+tr)/2;
+    build_tree(2*ind,tl,mid);
+    build_tree(2*ind+1,mid+1,tr);
+    tree[ind].num=min(tree[2*ind].num,tree[2*ind+1].num);
+    tree[ind].gcd=__gcd(tree[2*ind].gcd,tree[2*ind+1].gcd);
+    if(tree[2*ind].num>tree[2*ind+1].num){
+        tree[ind].counter=tree[2*ind+1].counter;
+    }else if(tree[2*ind].num<tree[2*ind+1].num){
+        tree[ind].counter=tree[2*ind].counter;
+    }else{
+        tree[ind].counter=tree[2*ind].counter+tree[2*ind+1].counter;
     }
 }
+
+void calc_res(int ind, int tl, int tr, int l, int r, Query& res){
+    if(r<tl or l>tr){
+        return;
+    }
+    if(l==tl and r==tr){
+        if(tree[ind].num<res.num){
+            res.counter=tree[ind].counter;
+        }else if(tree[ind].num==res.num){
+            res.counter+=tree[ind].counter;
+        }
+        res.num=min(res.num,tree[ind].num);
+        res.gcd=__gcd(res.gcd,tree[ind].gcd);
+        return;
+    }
+    int mid=(tl+tr)/2;
+    calc_res(2*ind,tl,mid,l,min(mid,r),res);
+    calc_res(2*ind+1,mid+1,tr,max(mid+1,l),r,res);
+}
+
 int main(){
     ios::sync_with_stdio(false);
-    cin.tie(0);
-    int n,q,pow=1;
+    cin.tie(nullptr);
+
+    int n;
     cin>>n;
-    while(pow<n){
-        pow*=2;
-    }
-    for(int i=0;i<n;i++){
+    for(int i=0;i<n;++i){
         cin>>nums[i];
-        tree[pow+i]={nums[i],{1,nums[i]}};
     }
-    for(int i=0;i<pow%n;i++){
-        tree[pow+n+i]={INT_MAX,{1,nums[n-1]}};
-    }
-    for(int i=pow-1;i>=1;i--){
-        tree[i].first=min(tree[2*i].first,tree[2*i+1].first);
-        if(tree[2*i].first<tree[2*i+1].first){
-            tree[i].second.first=tree[2*i].second.first;
-        }else if(tree[2*i].first>tree[2*i+1].first){
-            tree[i].second.first=tree[2*i+1].second.first;
-        }else if(tree[2*i].first==tree[2*i+1].first){
-            tree[i].second.first=tree[2*i+1].second.first+tree[2*i].second.first;
-        }
-        tree[i].second.second=__gcd(tree[2*i+1].second.second,tree[2*i].second.second);
-    }
+
+    build_tree(1,0,n-1);
+    int q;
     cin>>q;
-    for(int i=0;i<q;i++){
+    while(q--){
+        int l,r;
         cin>>l>>r;
-        l--;
-        r--;
-        ans1=INT_MAX;
-        ans2=0;
-        ans3=0;
-        find_answers(1,0,pow-1);
-        cout<<ans1<<" "<<ans2<<" "<<ans3<<endl;
+        --l;
+        --r;
+        Query res;
+        calc_res(1,0,n-1,l,r,res);
+        cout<<res.num<<" "<<res.counter<<" "<<res.gcd<<endl;
     }
 return 0;
 }
