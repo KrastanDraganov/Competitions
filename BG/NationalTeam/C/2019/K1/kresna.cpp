@@ -1,3 +1,5 @@
+// Only 81/100 points
+
 #include<iostream>
 #include<algorithm>
 #include<utility>

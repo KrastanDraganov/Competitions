@@ -1,3 +1,5 @@
+// 30/100 POINTS
+
 #include<iostream>
 #include<algorithm>
 #include<utility>
