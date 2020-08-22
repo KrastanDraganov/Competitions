@@ -3,13 +3,15 @@
 #include<queue>
 #include<utility>
 #include<cstring>
+
 #define endl '\n'
-#define MAXN 53
-#define MAXMASK 4097
+
 using namespace std;
-const int INF = 1e8+3;
+
+const int MAXN=53,MAXM=5e3,INF=1e8+3;
 vector<pair<int,int>> graph[MAXN][13];
-int dist[MAXN],dp[MAXN][13][MAXMASK];
+int dist[MAXN],dp[MAXN][13][MAXM];
+
 int sol(int node, int remainder, int mask, int endp){
     if(node>=endp) return 0;
     if(dp[node][remainder][mask]!=-1) return dp[node][remainder][mask];
@@ -24,6 +26,7 @@ int sol(int node, int remainder, int mask, int endp){
     }
     return dp[node][remainder][mask]=ans;
 }
+
 int dijkstra(int startp, int endp){
     for(int i=1;i<=endp;++i){
         dist[i]=INF;
@@ -46,11 +49,32 @@ int dijkstra(int startp, int endp){
     }
     return INF;
 }
+
+int check(int res){
+    return (res<INF ? res : -1);
+}
+
+int calc_res(int n, string& type){
+    if(type=="False"){
+        return check(dijkstra(1,n));
+    }
+    for(int i=0;i<MAXN;++i){
+        for(int i2=0;i2<13;++i2){
+            for(int i3=0;i3<MAXM;++i3){
+                dp[i][i2][i3]=-1;
+            }
+        }
+    }
+    return check(sol(1,0,0,n));
+}
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    
     int t;
     cin>>t;
+    
     for(int test=0;test<t;++test){
         int n,m;
         cin>>n>>m;
@@ -66,20 +90,7 @@ int main(){
         }
         string type;
         cin>>type;
-        int ans;
-        if(type=="False"){
-            ans=dijkstra(1,n);
-        }else{
-            for(int i=0;i<MAXN;++i){
-                for(int i2=0;i2<13;++i2){
-                    for(int i3=0;i3<MAXMASK;++i3){
-                        dp[i][i2][i3]=-1;
-                    }
-                }
-            }
-            ans=sol(1,0,0,n);
-        }
-        cout<<(ans<INF ? ans : -1)<<endl;
+        cout<<calc_res(n,type)<<endl;
     }
 return 0;
 }
