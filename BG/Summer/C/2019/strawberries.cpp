@@ -30,9 +30,17 @@ long long sol(int x, int y, int counter){
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    
     int x,y,n;
     cin>>x>>y>>n;
-    memset(dp,-1,sizeof(dp));
+    
+    for(int i=0;i<MAXN;++i){
+        for(int i2=0;i2<MAXN;++i2){
+            for(int i3=0;i3<MAXN;++i3){
+                dp[i][i2][i3]=-1;
+            }
+        }
+    }
     cout<<sol(x,y,n)<<endl;
 return 0;
 }
