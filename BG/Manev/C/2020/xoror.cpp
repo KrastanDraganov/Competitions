@@ -1,3 +1,5 @@
+//Only 69/100 points
+
 #include<iostream>
 
 #define endl '\n'
