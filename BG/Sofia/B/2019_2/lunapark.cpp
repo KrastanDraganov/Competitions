@@ -1,14 +1,20 @@
+//Only 0/100 points
+
 #include<iostream>
 #include<vector>
 #include<stack>
 #include<utility>
+
 #define endl '\n'
+
 using namespace std;
+
 const int MAXN=2e5+3;
 vector<pair<int,int>> graph[MAXN],cycle;
 bool used[MAXN];
 int orig_pos[MAXN],cycle_pos[MAXN],root_dist[MAXN],logarithm[MAXN],rmq[MAXN][20];
 stack<pair<int,int>> path;
+
 bool dfs1(int curr, int parent){
     used[curr]=true;
     for(pair<int,int> next : graph[curr]){
@@ -31,6 +37,7 @@ bool dfs1(int curr, int parent){
     }
     return false;
 }
+
 void dfs2(int curr){
     used[curr]=true;
     for(pair<int,int> next : graph[curr]){
@@ -41,6 +48,7 @@ void dfs2(int curr){
         }
     }
 }
+
 void calc_rmq(int n){
     logarithm[1]=0;
     for(int i=2;i<=n;++i){
@@ -56,6 +64,7 @@ void calc_rmq(int n){
         }
     }
 }
+
 long long query(int l, int r){
     if(l>r){
         return 0;
@@ -66,9 +75,11 @@ long long query(int l, int r){
     }
     return max(rmq[l][logarithm[diff]-1],rmq[r-(1<<(logarithm[diff]-1))+1][logarithm[diff]-1]);
 }
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    
     int n;
     cin>>n;
     for(int i=0;i<n;++i){
@@ -77,20 +88,25 @@ int main(){
         graph[from].push_back({to,weight});
         graph[to].push_back({from,weight});
     }
+    
     path.push({1,0});
     dfs1(1,0);
+
     for(int i=1;i<=n;++i){
         orig_pos[i]=i;
         used[i]=false;
     }
+    
     for(int i=0;i<cycle.size();++i){
         cycle_pos[cycle[i].first]=i;
         used[cycle[i].first]=true;
+    
     }
     for(pair<int,int> curr : cycle){
         dfs2(curr.first);
     }
     calc_rmq(n);
+    
     int q;
     cin>>q;
     long long ans=0;

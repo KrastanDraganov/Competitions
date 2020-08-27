@@ -3,18 +3,23 @@
 #include<unordered_set>
 #include<queue>
 #include<cstring>
+
 #define endl '\n'
+
 using namespace std;
+
 const int MAXN=1e4+3;
 vector<unordered_set<int>> graph;
 int parent[MAXN],depth[MAXN];
 bool used[MAXN];
+
 int find_parent(int num){
     if(num==parent[num]){
         return num;
     }
     return parent[num]=find_parent(parent[num]);
 }
+
 int combine(int num1, int num2){
     int root1=find_parent(num1),root2=find_parent(num2);
     if(root1!=root2){
@@ -25,11 +30,14 @@ int combine(int num1, int num2){
         depth[root1]+=depth[root2];
     }
 }
+
 bool check(int x, int y){
     memset(used,0,sizeof(used));
     used[x]=true;
+    
     queue<int> bfs;
     bfs.push(x);
+    
     while(!bfs.empty()){
         int curr=bfs.front();
         bfs.pop();
@@ -44,12 +52,15 @@ bool check(int x, int y){
     }
     return false;
 }
+
 void calc_bfs(int x){
     memset(used,0,sizeof(used));
     used[x]=true;
+    
     queue<int> bfs;
     bfs.push(x);
     parent[x]=x;
+    
     while(!bfs.empty()){
         int curr=bfs.front();
         bfs.pop();
@@ -62,16 +73,20 @@ void calc_bfs(int x){
         }
     }
 }
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    
     int n,m;
     cin>>n>>m;
+    
     for(int i=1;i<=n+1;++i){
         depth[i]=1;
         parent[i]=i;
         graph.emplace_back();
     }
+    
     for(int i=0;i<m;++i){
         int from,to;
         cin>>from>>to;
@@ -79,6 +94,7 @@ int main(){
         graph[to].insert(from);
         combine(from,to);
     }
+    
     int q;
     cin>>q;
     while(q--){
