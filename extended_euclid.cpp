@@ -19,7 +19,7 @@ pair<long long, long long> euclid(long long x,long long y){
 int main(){
 	ios::sync_with_stdio(false);
 	cin.tie(nullptr);
-	
+
 	long long a,b;
 	cin>>a>>b;
 
