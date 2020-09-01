@@ -36,7 +36,6 @@ void add_word(int word, int ind, Node* curr){
 void search_word(int start_ind, int ind, Node* curr){
     if(curr->word!=-1){
         int end_ind=start_ind+dictionary[curr->word].size()-1;
-        //cout<<end_ind<<" "<<dp[end_ind]<<" "<<dp[end_ind+1]<<endl;
         if(end_ind==input.size()-1){
             if(dp[start_ind]>1){
                 dp[start_ind]=1;
@@ -61,19 +60,24 @@ void search_word(int start_ind, int ind, Node* curr){
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    
     int n;
     cin>>input>>n;
+    
     Node* trie=new Node;
     for(int i=0;i<n;++i){
         cin>>dictionary[i];
         add_word(i,0,trie);
     }
+    
     for(int i=0;i<MAXN;++i){
         dp[i]=1e8;
     }
+    
     for(int i=input.size()-1;i>=0;--i){
         search_word(i,i,trie);
     }
+    
     cout<<dp[0]<<endl;
     int pos=0;
     while(pos<input.size()){

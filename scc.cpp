@@ -2,12 +2,15 @@
 #include<vector>
 #include<stack>
 #include<cstring>
+
 #define endl '\n'
+
 using namespace std;
+
 const int MAXN=1e3+3;
-vector<int> graph[MAXN],rev_graph[MAXN];
+vector<int> graph[MAXN],rev_graph[MAXN],topo;
 bool used[MAXN];
-stack<int> topological;
+
 void dfs(int curr){
     used[curr]=true;
     for(int nextv : graph[curr]){
@@ -15,8 +18,9 @@ void dfs(int curr){
             dfs(nextv);
         }
     }
-    topological.push(curr);
+    topo.push_back(curr);
 }
+
 void check_dfs(int curr){
     used[curr]=true;
     cout<<curr<<" ";
@@ -26,9 +30,11 @@ void check_dfs(int curr){
         }
     }
 }
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+
     int n,m;
     cin>>n>>m;
     for(int i=0;i<m;++i){
@@ -37,25 +43,22 @@ int main(){
         graph[from].push_back(to);
         rev_graph[to].push_back(from);
     }
-    int num=1;
+
     for(int i=1;i<=n;++i){
         if(!used[i]){
             dfs(i);
         }
     }
-    stack<int> rev;
-    memset(used,0,sizeof(used));
-    while(!topological.empty()){
-        rev.push(topological.top());
-        topological.pop();
+    
+    for(int i=0;i<MAXN;++i){
+        used[i]=false;
     }
-    while(!rev.empty()){
-        if(!used[rev.top()]){
+    for(int i=(int)topo.size()-1;i>=0;--i){
+        if(!used[topo[i]]){
             cout<<"components: ";
-            check_dfs(rev.top());
+            check_dfs(topo[i]);
             cout<<endl;
         }
-        rev.pop();
     }
 return 0;
 }
