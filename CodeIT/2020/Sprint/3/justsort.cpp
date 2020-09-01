@@ -1,3 +1,5 @@
+//Only 0/100 points
+
 #include<iostream>
 #include<stdio.h>
 #include<vector>

@@ -1,14 +1,20 @@
 #include<iostream>
 #include<string>
 #include<vector>
+
 #define endl '\n'
+
 using namespace std;
+
 vector<int> pos;
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    
     string map;
     cin>>map;
+    
     int counter=0,curr=-1;
     string res=map;
     for(int i=0;i<map.size();++i){
@@ -18,11 +24,13 @@ int main(){
             ++counter;
         }
     }
+    
     int all=1;
     for(int i=0;i<counter;++i){
         all*=3;
     }
     curr=((int)pos.size()==0 ? -1 : pos[pos.size()-1]);
+    
     cout<<all<<endl;
     for(int i=0;i<all;++i){
         cout<<res<<endl;

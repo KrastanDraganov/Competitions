@@ -34,8 +34,10 @@ void calc_dijkstra(int ind){
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    
     int n,m,k;
     cin>>n>>m>>k;
+    
     for(int i=0;i<k;++i){
         int market;
         cin>>market;
@@ -43,6 +45,7 @@ int main(){
         is_market[market]=true;
         markets[i]={market,i};
     }
+    
     for(int i=0;i<m;++i){
         int from,to,length;
         cin>>from>>to>>length;
@@ -51,12 +54,14 @@ int main(){
         graph[from].push_back({to,length});
         graph[to].push_back({from,length});
     }
+    
     for(int i=0;i<k;++i){
         for(int i2=0;i2<MAXN;++i2){
             dist[i][i2]=1e9;
         }
         calc_dijkstra(i);
     }
+    
     int res=1e9;
     sort(markets,markets+k);
     do{
@@ -71,6 +76,7 @@ int main(){
             }
         }
     }while(next_permutation(markets,markets+k));
+    
     cout<<res<<endl;
 return 0;
 }

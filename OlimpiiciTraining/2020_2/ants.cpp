@@ -17,10 +17,13 @@ set<pair<long long,pair<long long,int>>> available;
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    
     int n,m;
     cin>>n>>m;
+    
     long long prevx,prevy;
     cin>>prevx>>prevy;
+    
     for(int i=0;i<n-1;++i){
         long long currx,curry;
         cin>>currx>>curry;
@@ -29,6 +32,7 @@ int main(){
         prevx=currx;
         prevy=curry;
     }
+    
     for(int i=0;i<m;++i){
         long long curr;
         cin>>curr;
@@ -36,22 +40,26 @@ int main(){
     }
     sort(dist,dist+n-1);
     sort(sticks,sticks+m);
+    
     int ind=n-2;
     for(int i=m-1;i>=0;--i){
         while(ind>=0 and dist[ind].first<=sticks[i].first){
             cout<<"a: "<<i<<" "<<dist[ind].second.second<<endl;
             available.insert(dist[ind--]);
         }
+        
         while(!available.empty() and (*available.begin()).second.first<sticks[i].first){
             cout<<"b: "<<i<<" "<<dist[ind].second.second<<endl;
             available.erase(available.begin());
         }
+        
         if(!available.empty()){
             cout<<"c: "<<i<<" "<<(*available.begin()).second.second<<endl;
             res[(*available.begin()).second.second]=sticks[i].second;
             available.erase(available.begin());
         }
     }
+    
     for(int i=0;i<n-1;++i){
         cout<<res[i]+1<<" ";
     }

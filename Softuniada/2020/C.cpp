@@ -1,16 +1,22 @@
 #include<iostream>
+
 #define endl '\n'
+
 using namespace std;
+
 const int MAXN=1003;
 int cards[MAXN][MAXN];
+
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
+    
     int n;
     cin>>n;
     for(int i=0;i<n;++i){
         cards[0][i]=i+1;
     }
+    
     int pos,counter=0;
     while(cin>>pos){
         int l=0,r=pos;
@@ -23,6 +29,7 @@ int main(){
             }
         }
     }
+    
     for(int i=0;i<n;++i){
         cout<<cards[counter][i]<<" ";
     }
