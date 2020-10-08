@@ -1,5 +1,3 @@
-// Not solved - wrong answer
-
 #include<iostream>
  
 #define endl '\n'
@@ -7,29 +5,27 @@
 using namespace std;
  
 const int MAXN=2e5+3;
-long long nums[MAXN],tree[4*MAXN],lazy[4*MAXN];
+long long nums[MAXN],tree[4*MAXN],lazy[2][4*MAXN];
 
 long long sum(int num){
     return (long long) num*(num+1)/2;
 }
 
 void push(int ind, int l, int r){
-    if(lazy[ind]==-1){
+    if(lazy[0][ind]==0){
         return;
     }
 
     int mid=(l+r)/2;
 
-    int addl=l-lazy[ind]+1;
-    int addr=mid-lazy[ind]+1;
-    tree[2*ind]+=sum(addr)-sum(addl-1);
+    tree[2*ind]+=lazy[0][ind]*(sum(mid+1)-sum(l))-lazy[1][ind]*(mid-l+1);
+    tree[2*ind+1]+=lazy[0][ind]*(sum(r+1)-sum(mid+1))-lazy[1][ind]*(r-mid);
 
-    addl=mid+1-lazy[ind]+1;
-    addr=r-lazy[ind]+1;
-    tree[2*ind+1]+=sum(addr)-sum(addl-1);
-
-    lazy[2*ind]=lazy[2*ind+1]=lazy[ind];
-    lazy[ind]=-1;
+    for(int i=0;i<2;++i){
+        lazy[i][2*ind]+=lazy[i][ind];
+        lazy[i][2*ind+1]+=lazy[i][ind];
+        lazy[i][ind]=0;
+    }
 }
  
 void build_tree(int ind, int tl, int tr){
@@ -54,7 +50,8 @@ void update_tree(int ind, int tl, int tr, int l, int r, int startl){
         int addl=l-startl+1;
         int addr=r-startl+1;
         tree[ind]+=sum(addr)-sum(addl-1);
-        lazy[ind]=startl;
+        ++lazy[0][ind];
+        lazy[1][ind]+=startl;
         return;
     }
  
@@ -89,10 +86,6 @@ int main(){
  
     int n,q;
     cin>>n>>q;
-    
-    for(int i=0;i<4*n;++i){
-        lazy[i]=-1;
-    }
 
     for(int i=0;i<n;++i){
         cin>>nums[i];
