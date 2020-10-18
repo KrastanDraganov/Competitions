@@ -1,5 +1,3 @@
-// Not solved - time limit with all optimizations I can think of
-
 #include<iostream>
 #include<string>
 #include<utility>
@@ -17,21 +15,11 @@ bool is_free(int x, int y){
     return (x>=0 and x<MAXN and y>=0 and y<MAXN and !visited[x][y]);
 }
  
-int dfs(int x, int y, char curr_dir, int ind, string& path){
-    if(ind>-1 and path[ind]!='?' and curr_dir!=path[ind]){
-        return 0;
-    }
-    
+int dfs(int x, int y, int ind, string& path){
     if(x==MAXN-1 and y==0){
-        if(ind+1==(int)path.size()){
+        if(ind==(int)path.size()){
             return 1;
         }
-        return 0;
-    }
-    
-    int free_col=is_free(x+1,y)+is_free(x-1,y);
-    int free_row=is_free(x,y+1)+is_free(x,y-1);
-    if((free_col==2 and free_row==0) or (free_col==0 and free_row==2)){
         return 0;
     }
  
@@ -40,9 +28,26 @@ int dfs(int x, int y, char curr_dir, int ind, string& path){
         int nextx=x+dirs[i].first;
         int nexty=y+dirs[i].second;
         
-        if(is_free(nextx,nexty)){
+        if(is_free(nextx,nexty) and (path[ind]=='?' or letter[i]==path[ind])){
+            bool is_locked=true;
+            
+            // are we moving to another column or row that block a part of the table
+            if(i<2){
+                is_locked &= !is_free(nextx, nexty+dirs[i].second);
+                is_locked &= is_free(nextx-1, nexty);
+                is_locked &= is_free(nextx+1, nexty);
+            }else{
+                is_locked &= !is_free(nextx+dirs[i].first, nexty);
+                is_locked &= is_free(nextx, nexty-1);
+                is_locked &= is_free(nextx, nexty+1);
+            }
+
+            if(is_locked){
+                continue;
+            }
+
             visited[nextx][nexty]=true;
-            res+=dfs(nextx, nexty, letter[i], ind+1, path);
+            res+=dfs(nextx, nexty, ind+1, path);
             visited[nextx][nexty]=false;
         }
     }
@@ -58,6 +63,6 @@ int main(){
     cin>>path;
  
     visited[0][0]=true;
-    cout<<dfs(0, 0, ' ', -1, path)<<endl;
+    cout<<dfs(0, 0, 0, path)<<endl;
 return 0;
 }
