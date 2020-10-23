@@ -57,14 +57,13 @@ bool is_sol(int n){
     }
 
     int counter=0;
-    for(int i=n-1;i>=2;--i){
+    for(int i=n-3;i>=0;--i){
         if(component[topo[i]]==-1){
             dfs2(topo[i], counter++);
         }
     }
 
     for(int i=2;i<n;i+=2){
-        cout<<i/2<<" "<<component[i]<<" "<<component[i+1]<<endl;
         if(component[i]==component[i+1]){
             return false;
         }
