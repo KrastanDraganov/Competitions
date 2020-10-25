@@ -71,17 +71,17 @@ int main(){
             denominator=mul_mod(denominator, factorial[curr]);
         }
     }
+    denominator=fast_pow(denominator, MOD-2);
 
     int res=1;
     for(int i=0;i<n;++i){
         int numerator=factorial[n-i-1];
         numerator=mul_mod(numerator, sum(nums[i]-1));
         
-        int curr=fast_pow(denominator, MOD-2);
-        numerator=mul_mod(numerator, curr);
+        numerator=mul_mod(numerator, denominator);
         add_mod(res, numerator);
         
-        denominator=mul_mod(denominator, fast_pow(sum(nums[i])-sum(nums[i]-1), MOD-2));
+        denominator=mul_mod(denominator, sum(nums[i])-sum(nums[i]-1));
         update_tree(nums[i], -1);
     }
 

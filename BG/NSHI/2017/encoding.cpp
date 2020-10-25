@@ -47,16 +47,17 @@ int sum(int ind){
 }
 
 long long fast_pow(long long num, long long degree){
-    if(degree==1){
-        return num;
+    long long res=1;
+    while(degree>0){
+        if(degree & 1){
+            res=mul_mod(res, num);
+            --degree;
+        }else{
+            num=mul_mod(num, num);
+            degree/=2;
+        }
     }
-
-    if(degree & 1){
-        return mul_mod(num, fast_pow(num, degree-1));
-    }
-
-    long long half=fast_pow(num, degree/2);
-    return mul_mod(half, half);
+    return res;
 }
 
 int main(){
@@ -83,20 +84,20 @@ int main(){
             denominator=mul_mod(denominator, factorial[curr]);
         }
     }
+    denominator=fast_pow(denominator, MOD-2);
 
     long long res=0;
     for(int i=0;i<n;++i){
         long long numerator=factorial[n-i-1];
         numerator=mul_mod(numerator, sum(nums[i]-1));
         
-        long long curr=fast_pow(denominator, MOD-2);
-        numerator=mul_mod(numerator, curr);
+        numerator=mul_mod(numerator, denominator);
         add_mod(res, numerator);
         
-        denominator=mul_mod(denominator, fast_pow(sum(nums[i])-sum(nums[i]-1), MOD-2));
+        denominator=mul_mod(denominator, sum(nums[i])-sum(nums[i]-1));
         update_tree(nums[i], -1);
     }
 
     cout<<res<<endl;
-    return 0;
+return 0;
 }
