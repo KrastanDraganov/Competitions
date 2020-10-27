@@ -1,5 +1,3 @@
-// Not solved - time limit
-
 #include<iostream>
 
 #define endl '\n'
@@ -35,9 +33,8 @@ int main(){
         dp[0][0]=1;
         for(int nums=1;nums<=n;++nums){
             for(int trucks=1;trucks<=min(k, nums);++trucks){
-                for(int ones=0;ones<=trucks;++ones){
-                    add_mod(dp[nums][trucks], dp[nums-trucks][ones]);
-                }
+                add_mod(dp[nums][trucks], dp[nums-trucks][trucks]);
+                add_mod(dp[nums][trucks], dp[nums-1][trucks-1]);
             }
         }
         
