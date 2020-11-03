@@ -8,37 +8,31 @@ using namespace std;
 
 const int MAXN=5e3+3;
 int gangs[MAXN];
-bool is_edge[MAXN][MAXN];
 
 vector<pair<int, int>> connect_gangs(int n){
-    for(int i=0;i<n;++i){
-        for(int i2=i;i2<n;++i2){
-            is_edge[i][i2]=is_edge[i2][i]=false;
-        }
-    }
-
     vector<pair<int, int>> edges;
-    int counter=0;
 
-    for(int i=0;i<n and counter<n-1;++i){
-        for(int i2=0;i2<n and counter<n-1;++i2){
-            if(gangs[i]==gangs[i2]){
-                continue;
-            }
-            
-            if(is_edge[i][i2] or is_edge[i2][i]){
-                continue;
-            }
-            
-            is_edge[i][i2]=is_edge[i2][i]=true;
-            edges.push_back({i, i2});
-            ++counter;
+    // Different from the first gang
+    int other_gang=-1;
+    for(int i=1;i<n;++i){
+        if(gangs[0]==gangs[i]){
+            continue;
         }
+        edges.push_back({0, i});
+        other_gang=i;
     }
 
-    if(counter!=n-1){
+    if(edges.empty()){
         return {};
     }
+
+    for(int i=1;i<n;++i){
+        if(gangs[0]!=gangs[i]){
+            continue;
+        }
+        edges.push_back({other_gang, i});
+    }
+
     return edges;
 }
 

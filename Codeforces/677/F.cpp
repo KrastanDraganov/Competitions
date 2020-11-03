@@ -29,32 +29,47 @@ int main(){
     }
 
     int limit=m/2;
-    for(int x=1;x<=n;++x){
-        for(int rem=0;rem<k;++rem){
-            prev_row_max[rem]=0;
+    for(int x=0;x<=n;++x){
+        for(int y=0;y<=m;++y){
             for(int counter=0;counter<=limit;++counter){
-                self_max(prev_row_max[rem], dp[x-1][m][counter][rem]);
+                for(int rem=0;rem<k;++rem){
+                    dp[x][y][counter][rem]=-1e9;
+                }
             }
         }
+    }
 
-        for(int y=1;y<=m;++y){
-            for(int rem=0;rem<k;++rem){
-                dp[x][y][0][rem]=prev_row_max[rem];
-                for(int counter=1;counter<=min(y+1, limit);++counter){
-                    dp[x][y][counter][rem]=dp[x][y-1][counter][rem];
+    dp[0][0][0][0]=0;
+    for(int x=0;x<n;++x){
+        for(int y=0;y<m;++y){
+            for(int counter=0;counter<=min(y+1, limit);++counter){
+                for(int rem=0;rem<k;++rem){
+                    int nextx=(y==m-1 ? x+1 : x);
+                    int nexty=(y==m-1 ? 0 : y+1);
+                    
+                    if(x==nextx){
+                        self_max(dp[nextx][nexty][counter][rem], dp[x][y][counter][rem]);
+                    }else{
+                        self_max(dp[nextx][nexty][0][rem], dp[x][y][counter][rem]);
+                    }
 
-                    int prev_rem=(rem-nums[x-1][y-1]+k)%k;
-                    self_max(dp[x][y][counter][rem], nums[x-1][y-1]+dp[x][y-1][counter-1][prev_rem]);
+                    if(counter==limit){
+                        continue;
+                    }
+
+                    int next_rem=(rem+nums[x][y])%k;
+                    int new_sum=dp[x][y][counter][rem]+nums[x][y];
+                    if(x==nextx){
+                        self_max(dp[nextx][nexty][counter+1][next_rem], new_sum);
+                    }else{
+                        self_max(dp[nextx][nexty][0][next_rem], new_sum);
+                    }
                 }
             }
         }
     }
     
-    int res=0;
-    for(int counter=0;counter<=limit;++counter){
-        self_max(res, dp[n][m][counter][0]);
-    }
-
-    cout<<res<<endl;
+    self_max(dp[n][0][0][0], 0);
+    cout<<dp[n][0][0][0]<<endl;
 return 0;
 }
