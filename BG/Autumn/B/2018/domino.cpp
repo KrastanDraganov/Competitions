@@ -1,5 +1,3 @@
-// Not solved - 85 points, time limit
-
 #include<iostream>
 #include<vector>
 #include<stack>
@@ -9,10 +7,11 @@
 using namespace std;
 
 const int MAXN=(1<<10)+3;
-int graph[MAXN][MAXN],degree[MAXN];
+stack<int> graph[MAXN];
+int edges[MAXN][MAXN],degree[MAXN];
 bool used[MAXN],fake_edge[MAXN][MAXN];
 
-vector<int> find_euler_path(int startv, int n){
+vector<int> find_euler_path(int startv){
     stack<int> dfs;
     dfs.push(startv);
     
@@ -22,14 +21,17 @@ vector<int> find_euler_path(int startv, int n){
         used[currv]=true;
 
         bool is_edge=false;
-        for(int nextv=0;nextv<=n;++nextv){
-            if(graph[currv][nextv]==0){
+        while(!graph[currv].empty()){
+            int nextv=graph[currv].top();
+            graph[currv].pop();
+
+            if(edges[currv][nextv]==0){
                 continue;
             }
             is_edge=true;
 
-            --graph[currv][nextv];
-            --graph[nextv][currv];
+            --edges[currv][nextv];
+            --edges[nextv][currv];
 
             dfs.push(nextv);
             break;
@@ -107,8 +109,10 @@ vector<vector<int>> find_chains(int n){
             continue;
         }
         
-        ++graph[prev_odd][i];
-        ++graph[i][prev_odd];
+        graph[prev_odd].push(i);
+        graph[i].push(prev_odd);
+        ++edges[prev_odd][i];
+        ++edges[i][prev_odd];
         fake_edge[prev_odd][i]=fake_edge[i][prev_odd]=true;
         
         prev_odd=-1;
@@ -120,7 +124,7 @@ vector<vector<int>> find_chains(int n){
             continue;
         }
         
-        vector<int> curr_chain=find_euler_path(i, n);
+        vector<int> curr_chain=find_euler_path(i);
         
         vector<vector<int>> divided=remove_fake_edges(curr_chain);
         res.insert(res.end(), divided.begin(), divided.end());
@@ -138,8 +142,8 @@ int main(){
     
     for(int i=0;i<=n;++i){
         for(int i2=i;i2<=n;++i2){
-            ++graph[i][i2];
-            ++graph[i2][i];
+            ++edges[i][i2];
+            ++edges[i2][i];
             
             ++degree[i];
             ++degree[i2];
@@ -150,11 +154,19 @@ int main(){
         int from,to;
         cin>>from>>to;
         
-        --graph[from][to];
-        --graph[to][from];
+        --edges[from][to];
+        --edges[to][from];
         
         --degree[from];
         --degree[to];
+    }
+
+    for(int i=0;i<=n;++i){
+        for(int i2=0;i2<=n;++i2){
+            for(int i3=0;i3<edges[i][i2];++i3){
+                graph[i].push(i2);
+            }
+        }
     }
 
     vector<vector<int>> res=find_chains(n);
