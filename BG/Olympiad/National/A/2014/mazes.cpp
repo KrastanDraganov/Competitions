@@ -1,5 +1,3 @@
-// Not solved - 56 points, wrong answer
-
 #include<iostream>
 #include<vector>
 
@@ -69,7 +67,7 @@ Matrix identity_matrix(int n){
     return res;
 }
 
-Matrix fast_pow(Matrix& matrix, int degree){
+Matrix fast_pow(Matrix& matrix, long long degree){
     Matrix res=identity_matrix(matrix.rows);
     while(degree>0){
         if(degree & 1){
@@ -87,19 +85,12 @@ bool is_set(int pos, int mask){
     return (1<<pos) & mask;
 }
 
-string print_mask(int mask, int n){
-    string res="";
-    for(int i=0;i<n;++i){
-        res+=to_string(is_set(i, mask));
-    }
-    return res;
-}
-
 int main(){
     ios::sync_with_stdio(false);
     cin.tie(nullptr);
 
-    int n,m;
+    int n;
+    long long m;
     cin>>n>>m;
     n-=2;
     
@@ -119,11 +110,6 @@ int main(){
                     profile2 |= (1<<i);
                 }
             }
-
-            // cout<<"Making matrix: \n";
-            // cout<<"profile1: "<<print_mask(profile1, n)<<endl;
-            // cout<<"coloring: "<<print_mask(coloring, n)<<endl;
-            // cout<<"profile2: "<<print_mask(profile2, n)<<endl;
             
             ++compatible.values[profile1][profile2];
         }
