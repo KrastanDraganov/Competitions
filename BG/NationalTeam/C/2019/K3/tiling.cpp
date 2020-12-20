@@ -4,27 +4,42 @@
 
 using namespace std;
 
-const int MAXN=103,MOD=1e9+7;
-int dp[MAXN][(1<<10)+3];
+const int MAXN=103,MAXM=(1<<10)+3,MOD=1e9+7;
+int dp[MAXN][MAXM];
 
-bool check(int mask1, int mask2, int m){
-    int counter=0;
-    for(int i=0;i<m;++i){
-        if(mask2 & (1<<i)){
-            if((mask1 & (1<<i)) or counter%2){
-                return false;
-            }
-            counter=0;
-        }else if(mask1 & (1<<i)){
-            if(counter%2){
-                return false;
-            }
-            counter=0;
-        }else{
-            ++counter;
-        }
+void add_mod(int& x, int y){
+    x+=y;
+    if(x>=MOD){
+        x-=MOD;
     }
-    return !(counter%2);
+}
+
+bool is_set(int pos, int mask){
+    return (1<<pos) & mask;
+}
+
+// Mask values: 0 - empty cell, will be filled with horizontal domino
+// 1 - occupied cell with either vertical or horizontal domino
+bool check(int prev_col, int curr_col, int n){
+    int counter=0;
+    
+    for(int i=0;i<n;++i){
+        if(is_set(i, prev_col) and is_set(i, curr_col)){
+            ++counter;
+            continue;
+        }
+
+        if(counter & 1){
+            return false;
+        }
+        if(!is_set(i, prev_col) and !is_set(i, curr_col)){
+            return false;
+        }
+
+        counter=0;
+    }
+    
+    return counter%2==0;
 }
 
 int main(){
@@ -34,20 +49,22 @@ int main(){
     int n,m;
     cin>>n>>m;
     
-    if(n<m){
+    if(n>m){
         swap(n,m);
     }
     
-    dp[0][0]=1;
-    for(int i=1;i<=n;++i){
-        for(int i2=0;i2<(1<<m);++i2){
-            for(int i3=0;i3<(1<<m);++i3){
-                if(check(i3,i2,m)){
-                    dp[i][i2]=(dp[i][i2]+dp[i-1][i3])%MOD;
+    int limit=(1<<n);
+    dp[0][limit-1]=1;
+    for(int i=1;i<=m;++i){
+        for(int curr_col=0;curr_col<limit;++curr_col){
+            for(int prev_col=0;prev_col<limit;++prev_col){
+                if(check(prev_col, curr_col, n)){
+                    add_mod(dp[i][curr_col], dp[i-1][prev_col]);
                 }
             }
         }
     }
-    cout<<dp[n][0]<<endl;
+
+    cout<<dp[m][limit-1]<<endl;
 return 0;
 }
