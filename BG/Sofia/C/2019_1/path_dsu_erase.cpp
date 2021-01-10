@@ -1,5 +1,4 @@
-// Not solved - 57 points, wrong answer
-// Solving with DSU with erasing
+// Solved with DSU with erasing
 
 #include<iostream>
 #include<vector>
@@ -27,6 +26,14 @@ int parent[MAXN],depth[MAXN];
 pair<int, int> questions[MAXQ];
 vector<pair<int, int>> tree[4*MAXQ];
 stack<Change> changes;
+
+void format_vertices(int& from, int& to){
+    --from;
+    --to;
+    if(from>to){
+        swap(from, to);
+    }
+}
 
 int find_parent(int num){
     if(num==parent[num]){
@@ -112,27 +119,21 @@ int main(){
     for(int i=0;i<m;++i){
         int from,to;
         cin>>from>>to;
-        --from;
-        --to;
+        format_vertices(from, to);
         added_edge[{from, to}]=0;
     }
 
     int q;
     cin>>q;
 
-    for(int i=0;i<=q;++i){
+    for(int i=0;i<q;++i){
         questions[i]={-1, -1};
     }
 
-    for(int i=1;i<=q;++i){
+    for(int i=0;i<q;++i){
         int type,from,to;
         cin>>type>>from>>to;
-        
-        --from;
-        --to;
-        if(from>to){
-            swap(from, to);
-        }
+        format_vertices(from, to);
 
         if(type==1){
             questions[i]={from, to};
@@ -151,12 +152,12 @@ int main(){
         }
 
         int curr_add=added_edge[{from, to}];
-        update_tree(1, 0, q, curr_add, i, {from, to});
+        update_tree(1, 0, q-1, curr_add, i, {from, to});
         added_edge.erase({from, to});
     }
 
     for(auto curr : added_edge){
-        update_tree(1, 0, q, curr.second, q, curr.first);
+        update_tree(1, 0, q-1, curr.second, q-1, curr.first);
     }
 
     for(int i=0;i<n;++i){
@@ -164,7 +165,7 @@ int main(){
         depth[i]=1;
     }
 
-    answer_questions(1, 0, q);
+    answer_questions(1, 0, q-1);
     cout<<endl;
 return 0;
 }
