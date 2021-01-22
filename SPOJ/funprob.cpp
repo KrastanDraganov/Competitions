@@ -1,0 +1,21 @@
+// Not solved - wrong answer
+
+#include<iostream>
+#include<iomanip>
+
+#define endl '\n'
+
+using namespace std;
+
+int main(){
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    int n,m;
+
+    while(cin>>n>>m and !(n==0 and m==0)){
+        double res=double(m+1-n)/double(m+1);
+        cout<<fixed<<setprecision(6)<<res<<endl;
+    }
+return 0;
+}
