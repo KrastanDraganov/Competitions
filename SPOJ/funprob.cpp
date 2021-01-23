@@ -1,5 +1,3 @@
-// Not solved - wrong answer
-
 #include<iostream>
 #include<iomanip>
 
