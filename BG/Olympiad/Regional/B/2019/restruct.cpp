@@ -1,5 +1,3 @@
-// Not solved - wrong answer, 50 points
-
 #include<iostream>
 #include<vector>
 #include<queue>
@@ -11,7 +9,7 @@ using namespace std;
 const int MAXN=5e3+3;
 vector<int> graph[MAXN];
 
-int find_min_salary(int startv, int n){
+int find_min_depth(int startv, int n){
     queue<int> bfs;
     bfs.push(startv);
 
@@ -34,7 +32,7 @@ int find_min_salary(int startv, int n){
         }
     }
 
-    return (visited<n ? 0 : sum_depths);
+    return (visited<n ? -1 : sum_depths);
 }
 
 int main(){
@@ -57,7 +55,10 @@ int main(){
 
     long long res=1e18;
     for(int i=0;i<n;++i){
-        res=min(res, 1ll*find_min_salary(i, n)*k);
+        int min_depth=find_min_depth(i, n);
+        if(min_depth!=-1){
+            res=min(res, 1ll*min_depth*k);
+        }
     }
 
     cout<<res<<endl;
