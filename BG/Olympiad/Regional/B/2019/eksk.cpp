@@ -1,5 +1,6 @@
 #include<iostream>
 #include<vector>
+#include<algorithm>
 
 #define endl '\n'
 
@@ -7,34 +8,28 @@ using namespace std;
 
 const int MAXN=2e5+3;
 vector<int> graph[MAXN];
-int path_dist[MAXN],max_dist[MAXN];
+int max_dist[MAXN],parent[MAXN];
+bool on_main_path[MAXN];
 
-void dfs_path(int currv, int parent, int endv){
-    if(currv==endv){
-        path_dist[currv]=1;
-        return;
-    }
-
-    path_dist[currv]=-MAXN;
+void dfs_path(int currv){
     for(int nextv : graph[currv]){
-        if(nextv==parent){
+        if(nextv==parent[currv]){
             continue;
         }
-
-        dfs_path(nextv, currv, endv);
-        path_dist[currv]=max(path_dist[currv], path_dist[nextv]+1);
+        parent[nextv]=currv;
+        dfs_path(nextv);
     }
 }
 
-void dfs_dist(int currv, int parent, int endv){
+void dfs_dist(int currv){
     max_dist[currv]=0;
     for(int nextv : graph[currv]){
-        if(nextv==parent){
+        if(nextv==parent[currv]){
             continue;
         }
 
-        dfs_dist(nextv, currv, endv);
-        if(path_dist[nextv]>0){
+        dfs_dist(nextv);
+        if(on_main_path[nextv]){
             continue;
         }
 
@@ -42,27 +37,16 @@ void dfs_dist(int currv, int parent, int endv){
     }
 }
 
-int find_max_route(int startv, int endv){
-    int currv=startv,parent=-1;
-    int visited=1;
-    int max_cities=0;
+int find_max_route(int startv, int endv, vector<int>& main_path){
+    int path_size=(int)main_path.size();
 
-    int res=0;
-    while(currv!=endv){
-        int next_in_path=-1;
-        for(int nextv : graph[currv]){
-            if(path_dist[nextv]>0 and parent!=nextv){
-                next_in_path=nextv;
-                break;
-            }
-        }
+    int max_cities=0,res=0;
+    for(int i=0;i<path_size-1;++i){
+        int currv=main_path[i];
+        int nextv=main_path[i+1];
 
-        max_cities=max(max_cities, max_dist[currv]+visited);
-        res=max(res, min(max_cities, path_dist[next_in_path]+max_dist[next_in_path]));
-
-        ++visited;
-        parent=currv;
-        currv=next_in_path;
+        max_cities=max(max_cities, max_dist[currv]+i+1);
+        res=max(res, min(max_cities, max_dist[nextv]+path_size-i-1));
     }
 
     return res;
@@ -91,9 +75,21 @@ int main(){
     --startv;
     --endv;
 
-    dfs_path(startv, -1, endv);
-    dfs_dist(startv, -1, endv);
+    parent[startv]=-1;
+    dfs_path(startv);
 
-    cout<<find_max_route(startv, endv)<<endl;
+    vector<int> main_path;
+    for(int currv=endv;currv!=startv;currv=parent[currv]){
+        main_path.push_back(currv);
+        on_main_path[currv]=true;
+    }
+    
+    main_path.push_back(startv);
+    on_main_path[startv]=true;
+    reverse(main_path.begin(), main_path.end());
+
+    dfs_dist(startv);
+
+    cout<<find_max_route(startv, endv, main_path)<<endl;
 return 0;
 }
