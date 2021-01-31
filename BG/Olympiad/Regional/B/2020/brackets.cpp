@@ -12,7 +12,7 @@ using namespace std;
 // 00(0) - there are no signs or the brackets are not removed
 // 01(1) - there is only '*' and '/'
 // 10(2) - there is only '+' and '-'
-// 11(3) - there are from ('*', '/') and ('+', '-')
+// 11(3) - there are from both ('*', '/') and ('+', '-')
 pair<int, int> remove_brackets(int ind, int n, string& expression, vector<bool>& removed){
     int first_sign=ind-1;
     ++ind;
@@ -50,8 +50,9 @@ pair<int, int> remove_brackets(int ind, int n, string& expression, vector<bool>&
         or (expression[first_sign]=='+' and expression[ind]!='*' and expression[ind]!='/')
         or (expression[first_sign]=='$' and expression[ind]!='*' and expression[ind]!='/')
         or (expression[first_sign]=='-' and (mask==0 or mask==1))
+        or (expression[first_sign]=='*' and (mask==0 or mask==1))
         or (expression[first_sign]!='/' and (mask==0 or mask==1) and expression[ind]=='/')
-        or (expression[first_sign]!='/' and (mask==0 or mask==1) and (expression[first_sign]=='*' or expression[ind]=='*')))
+        or (expression[first_sign]!='/' and (mask==0 or mask==1) and expression[ind]=='*'))
     {
         removed[first_sign+1]=removed[ind-1]=true; 
     }else{
