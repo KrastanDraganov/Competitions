@@ -57,6 +57,15 @@ struct Matrix {
         
         return res;
     }
+
+    void print(){
+        for(int i=0;i<rows;++i){
+            for(int i2=0;i2<cols;++i2){
+                cout<<values[i][i2]<<" ";
+            }
+            cout<<endl;
+        }
+    }
 };
 
 Matrix identity_matrix(int n){
