@@ -1,5 +1,3 @@
-// Not solved - wrong answer, 0 points
-
 #include<iostream>
 #include<vector>
 #include<algorithm>
@@ -25,12 +23,12 @@ struct Point {
 };
 
 long long signed_area(Point& a, Point& b, Point& c){
-    return a.v1*a.v2*c.v1*b.v2
-         + a.v1*b.v1*b.v2*c.v2
+    return a.v1*a.v2*b.v2*c.v1
          + a.v2*b.v1*c.v1*c.v2
+         + a.v1*b.v1*b.v2*c.v2
+         - a.v1*a.v2*b.v1*c.v2
          - a.v1*b.v2*c.v1*c.v2
-         - a.v2*b.v1*b.v2*c.v1
-         - a.v1*b.v1*b.v2*c.v2;
+         - a.v2*b.v1*b.v2*c.v1;
 }
 
 int main(){
@@ -48,7 +46,7 @@ int main(){
     vector<Point> convex_hull;
     int ch_size=0;
 
-    for(int i=n-1;i>=0;--i){
+    for(int i=0;i<n;++i){
         while(ch_size>=2 and signed_area(convex_hull[ch_size-2], convex_hull[ch_size-1], points[i])<=0){
             convex_hull.pop_back();
             --ch_size;
@@ -68,7 +66,7 @@ int main(){
     vector<bool> same_point(n, false);
     for(int i=1;i<n;++i){
         if(points[i]==points[i-1]){
-            same_point[i]=same_point[i-1]=true;
+            same_point[points[i].ind]=same_point[points[i-1].ind]=true;
         }
     }
 
@@ -79,10 +77,14 @@ int main(){
         }
     }
 
-    sort(res.begin(), res.end());
-    for(int curr : res){
-        cout<<curr<<" ";
+    if(res.empty()){
+        cout<<"-1\n";
+    }else{
+        sort(res.begin(), res.end());
+        for(int curr : res){
+            cout<<curr<<" ";
+        }
+        cout<<endl;
     }
-    cout<<endl;
 return 0;
 }
