@@ -1,5 +1,3 @@
-// Not solve - wrong answer
-
 #include<iostream>
 #include<vector>
 #include<random>
@@ -84,7 +82,7 @@ Treap* insert_num(Treap* treap, int num){
     array<Treap*, 2> split_point2 = split(split_point1[1], num+1);
 
     if(split_point2[0]){
-        return treap;
+        return merge(split_point1[0], merge(split_point2[0], split_point2[1]));
     }
 
     Treap* new_node = new Treap(num);
@@ -96,7 +94,7 @@ Treap* erase_num(Treap* treap, int num){
     array<Treap*, 2> split_point2 = split(split_point1[1], num+1);
 
     if(!split_point2[0]){
-        return treap;
+        return merge(split_point1[0], split_point1[1]);
     }
 
     return merge(split_point1[0], split_point2[1]);
