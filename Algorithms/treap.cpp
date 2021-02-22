@@ -53,22 +53,36 @@ void recover(Treap* curr){
     }
 }
 
-int print_val(Treap* curr){
-    return !curr ? -1 : curr->val;
-}
-
-array<Treap*, 2> split(Treap* curr, int target){
+array<Treap*, 2> split_by_num(Treap* curr, int target){
     if(!curr){
         return {nullptr, nullptr};
     }
 
     if(target <= curr->val){
-        array<Treap*, 2> left_split = split(curr->kids[0], target);
+        array<Treap*, 2> left_split = split_by_num(curr->kids[0], target);
         curr->kids[0] = left_split[1];
         recover(curr);
         return {left_split[0], curr};
     }else{
-        array<Treap*, 2> right_split = split(curr->kids[1], target);
+        array<Treap*, 2> right_split = split_by_num(curr->kids[1], target);
+        curr->kids[1] = right_split[0];
+        recover(curr);
+        return {curr, right_split[1]};
+    }
+}
+
+array<Treap*, 2> split_by_pos(Treap* curr, int pos){
+    if(!curr){
+        return {nullptr, nullptr};
+    }
+
+    if(pos <= treap_size(curr->kids[0])){
+        array<Treap*, 2> left_split = split_by_pos(curr->kids[0], pos);
+        curr->kids[0] = left_split[1];
+        recover(curr);
+        return {left_split[0], curr};
+    }else{
+        array<Treap*, 2> right_split = split_by_pos(curr->kids[1], pos - treap_size(curr->kids[0]) - 1);
         curr->kids[1] = right_split[0];
         recover(curr);
         return {curr, right_split[1]};
@@ -96,8 +110,8 @@ Treap* merge(Treap* l, Treap* r){
 }
 
 Treap* insert_num(Treap* treap, int num){
-    array<Treap*, 2> split_point1 = split(treap, num);
-    array<Treap*, 2> split_point2 = split(split_point1[1], num+1);
+    array<Treap*, 2> split_point1 = split_by_num(treap, num);
+    array<Treap*, 2> split_point2 = split_by_num(split_point1[1], num+1);
 
     if(split_point2[0]){
         return merge(split_point1[0], merge(split_point2[0], split_point2[1]));
@@ -108,8 +122,8 @@ Treap* insert_num(Treap* treap, int num){
 }
 
 Treap* erase_num(Treap* treap, int num){
-    array<Treap*, 2> split_point1 = split(treap, num);
-    array<Treap*, 2> split_point2 = split(split_point1[1], num+1);
+    array<Treap*, 2> split_point1 = split_by_num(treap, num);
+    array<Treap*, 2> split_point2 = split_by_num(split_point1[1], num+1);
 
     if(!split_point2[0]){
         return merge(split_point1[0], split_point1[1]);
