@@ -19,7 +19,7 @@ struct Edge {
 };
 
 vector<Edge> graph[MAXN];
-int visited[MAXN];
+bool visited[MAXN];
 
 void add_edge (int from, int to, int capacity) {
     graph[from].push_back(Edge(to, capacity, (int) graph[to].size()));

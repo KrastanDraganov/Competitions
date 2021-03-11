@@ -20,7 +20,7 @@ struct Edge {
 };
 
 vector<Edge> graph[MAXN];
-int dist[MAXN], visited[MAXN], edge_ind[MAXN];
+int dist[MAXN], edge_ind[MAXN];
 
 void add_edge(int from, int to, int capacity) {
     graph[from].push_back(Edge(to, capacity, (int) graph[to].size()));
@@ -41,7 +41,7 @@ bool is_augmenting_path(int source, int sink, int n) {
         bfs.pop();
 
         if (currv == sink) {
-            break;
+            return true;
         }
 
         for (Edge edge : graph[currv]) {
@@ -54,7 +54,7 @@ bool is_augmenting_path(int source, int sink, int n) {
         }
     }
 
-    return dist[sink] != -1;
+    return false;
 }
 
 int dfs(int currv, int min_capacity, int sink) {
@@ -62,7 +62,6 @@ int dfs(int currv, int min_capacity, int sink) {
         return min_capacity;
     }
 
-    visited[currv] = true;
     for (int& i = edge_ind[currv]; i < (int) graph[currv].size(); ++i) {
         Edge& edge = graph[currv][i];
 
