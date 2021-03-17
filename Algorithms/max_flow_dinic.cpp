@@ -31,7 +31,7 @@ bool is_augmenting_path(int source, int sink, int n) {
     for (int i = 0; i < n; ++i) {
         dist[i] = -1;
     }
-    dist[0] = 0;
+    dist[source] = 0;
 
     queue<int> bfs;
     bfs.push(source);
