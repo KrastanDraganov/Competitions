@@ -97,7 +97,7 @@ int main(){
 
     for (int i = 0; i < m; ++i) {
         int from, to, capacity;
-        cin >> from >> to >>capacity;
+        cin >> from >> to >> capacity;
         add_edge(from, to, capacity);
     }
 
