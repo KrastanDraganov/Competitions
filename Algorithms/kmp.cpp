@@ -12,7 +12,7 @@ int main() {
 
     string pattern;
     cin >> pattern;
-
+    
     int n = (int) pattern.size();
     vector<int> prefix(n, 0);
     for (int i = 1; i < n; ++i) {
@@ -34,11 +34,11 @@ int main() {
     int m = (int) text.size();
     int res = 0, matched = 0;
     for (int end_ind = 0; end_ind < m; ++end_ind) {
-        while (matched > 0 and text[matched] != text[end_ind]) {
+        while (matched > 0 and pattern[matched] != text[end_ind]) {
             matched = prefix[matched - 1];
         }
 
-        if (text[matched] != text[end_ind]) {
+        if (pattern[matched] != text[end_ind]) {
             matched = 0;
             continue;
         }
