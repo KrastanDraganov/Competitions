@@ -48,24 +48,32 @@ int fast_sol(string& s) {
     }
 
     int limit = n / 2;
-    vector<vector<int>> dp(n, vector<int>(limit + 1, 0));
+    vector<vector<int>> dp(2, vector<int>(limit + 1, 0));
     dp[0][1] = 1;
 
     for (int i = 1; i < n; ++i) {
+        int curr = i & 1;
+        int prev = curr ^ 1;
+
+        for (int open_brackets = 0; open_brackets <= limit; ++open_brackets) {
+            dp[curr][open_brackets] = 0;
+        }
+
         if (s[i] == '(' or s[i] == '?') {
-            for (int counter = 0; counter <= min(i, limit - 1); ++counter) {
-                add_mod(dp[i][counter + 1], dp[i - 1][counter]);
+            for (int open_brackets = 0; open_brackets <= min(i, limit - 1); ++open_brackets) {
+                add_mod(dp[curr][open_brackets + 1], dp[prev][open_brackets]);
             }
         }
 
         if (s[i] == ')' or s[i] == '?') {
-            for (int counter = 1; counter <= min(i, limit); ++counter) {
-                add_mod(dp[i][counter - 1], dp[i - 1][counter]);
+            for (int open_brackets = 1; open_brackets <= min(i, limit); ++open_brackets) {
+                add_mod(dp[curr][open_brackets - 1], dp[prev][open_brackets]);
             }
         }
     }
 
-    return dp[n - 1][0];
+    int last_pos = (n - 1) & 1;
+    return dp[last_pos][0];
 }
 
 int main() {
@@ -76,6 +84,5 @@ int main() {
     cin >> s;
 
     cout << fast_sol(s) << endl;
-    // cout << brute_force(s) << endl;
 return 0;
 }
