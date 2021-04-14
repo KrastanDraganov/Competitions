@@ -5,55 +5,110 @@
 
 using namespace std;
 
-const int MAXN = 1e5 + 3;
-vector<int> graph[MAXN];
-int subtree_dist[MAXN], all_dist[MAXN];
-bool visited[MAXN];
+const int MAXN = 1e5 + 3, MAXM = 1e6 + 3;
 
-void dfs1(int currv) {
-    visited[currv] = true;
+vector<pair<int, int>> graph[MAXN];
+int in_time[MAXN], min_time[MAXN], component[MAXN], comp_size[MAXN];
+bool is_bridge[MAXM];
 
-    int& res = subtree_dist[currv];
-    res = 1;
-    for (int nextv : graph[currv]) {
-        if (!visited[nextv]) {
-            dfs1(nextv);
-            res = max(res, subtree_dist[nextv] + 1);
-        }
-    }
-}
+vector<int> tree[MAXN];
+int dist_down[MAXN], all_dist[MAXN];
 
-void dfs2(int currv, int parent, int prev_max_dist) {
-    all_dist[currv] = max(subtree_dist[currv], prev_max_dist + 1);
-    visited[currv] = true;
+void find_bridges(int currv, int parent, int& timer) {
+    in_time[currv] = min_time[currv] = timer++;
 
-    int max_dist1 = 0, max_dist2 = 0;
-    for (int nextv : graph[currv]) {
+    for (auto [nextv, ind] : graph[currv]) {
         if (nextv == parent) {
             continue;
         }
 
-        if (subtree_dist[nextv] > max_dist1) {
-            max_dist2 = max_dist1;
-            max_dist1 = subtree_dist[nextv];
-        } else if(subtree_dist[nextv] > max_dist2) {
-            max_dist2 = subtree_dist[nextv];
+        if (min_time[nextv] == 0) {
+            find_bridges(nextv, currv, timer);
+            
+            if (min_time[nextv] > in_time[currv]) {
+                is_bridge[ind] = true;
+            }
+        }
+
+        min_time[currv] = min(min_time[currv], min_time[nextv]);
+    }
+}
+
+void find_component(int currv, int id) {
+    component[currv] = id;
+    ++comp_size[id];
+
+    for (auto [nextv, ind] : graph[currv]) {
+        if (component[nextv] == -1 and !is_bridge[ind]) {
+            find_component(nextv, id);
         }
     }
+}
 
-    for (int nextv : graph[currv]) {
-        if (visited[nextv]) {
+void build_tree(int n) {
+    for (int currv = 0; currv < n; ++currv) {
+        for (auto [nextv, ind] : graph[currv]) {
+            if (is_bridge[ind]) {
+                tree[component[currv]].push_back(component[nextv]);
+            }
+        }
+    }
+}
+
+void dfs_down(int currv) {
+    int& res = dist_down[currv];
+    res = comp_size[currv];
+    
+    for (int nextv : tree[currv]) {
+        if (dist_down[nextv] != 0) {
+            continue;
+        }
+        
+        dfs_down(nextv);
+        res = max(res, dist_down[nextv] + comp_size[currv]);
+    }
+}
+
+void dfs_up(int currv, int parent, int max_dist_up) {
+    all_dist[currv] = max(dist_down[currv], max_dist_up + comp_size[currv]);
+
+    int max_dist_down1 = 0, max_dist_down2 = 0;
+    for (int nextv : tree[currv]) {
+        if (nextv == parent) {
             continue;
         }
 
-        int next_max_dist = prev_max_dist + 1;
-        if (subtree_dist[nextv] == max_dist1) {
-            next_max_dist = max(next_max_dist, max_dist2 + 1);
-        } else {
-            next_max_dist = max(next_max_dist, max_dist1 + 1);
+        if (dist_down[nextv] > max_dist_down1) {
+            max_dist_down2 = max_dist_down1;
+            max_dist_down1 = dist_down[nextv];
+        } else if(dist_down[nextv] > max_dist_down2) {
+            max_dist_down2 = dist_down[nextv];
+        }
+    }
+
+    for (int nextv : tree[currv]) {
+        if (all_dist[nextv] != 0) {
+            continue;
         }
 
-        dfs2(nextv, currv, next_max_dist);
+        int next_max_dist = max_dist_up;
+        if (dist_down[nextv] == max_dist_down1) {
+            next_max_dist = max(next_max_dist, max_dist_down2);
+        } else {
+            next_max_dist = max(next_max_dist, max_dist_down1);
+        }
+        next_max_dist += comp_size[currv];
+
+        dfs_up(nextv, currv, next_max_dist);
+    }
+}
+
+void find_max_dist_tree(int n) {
+    for (int i = 0; i < n; ++i) {
+        if (dist_down[i] == 0) {
+            dfs_down(i);
+            dfs_up(i, -1 , 0);
+        }
     }
 }
 
@@ -69,32 +124,40 @@ int main() {
         cin >> from >> to;
         --from;
         --to;
-        graph[from].push_back(to);
-        graph[to].push_back(from);
+        graph[from].push_back({to, i});
+        graph[to].push_back({from, i});
     }
 
+    int timer = 1;
     for (int i = 0; i < n; ++i) {
-        if (!visited[i]) {
-            dfs1(i);
+        if (min_time[i] == 0) {
+            find_bridges(i, -1, timer);
         }
     }
 
     for (int i = 0; i < n; ++i) {
-        visited[i] = false;
+        component[i] = -1;
     }
+
+    int all_components = 0;
     for (int i = 0; i < n; ++i) {
-        if(!visited[i]) {
-            dfs2(i, -1, 0);
+        if(component[i] == -1) {
+            find_component(i, all_components++);
         }
     }
+
+    build_tree(n);
+    find_max_dist_tree(all_components);
 
     int q;
     cin >> q;
 
     for (int i = 0; i < q; ++i) {
-        int target;
-        cin >> target;
-        cout << all_dist[target - 1] << " ";
+        int city;
+        cin >> city;
+
+        int target = component[city - 1];
+        cout << all_dist[target] << " ";
     }
     cout << endl;
 return 0;
