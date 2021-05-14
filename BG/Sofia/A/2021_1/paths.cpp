@@ -1,5 +1,3 @@
-// Not solved - wrong answer, 0 points
-
 #include <iostream>
 #include <vector>
 
@@ -8,15 +6,15 @@
 using namespace std;
 
 struct Matrix {
-    int limit;
     int rows, cols;
     vector<vector<int>> values;
+    int limit;
 
     Matrix(int _rows, int _cols, int _limit) {
-        limit = _limit;
         rows = _rows;
         cols = _cols;
         values.resize(rows, vector<int>(cols, 0));
+        limit = _limit;
     }
 
     Matrix(vector<vector<int>> _values, int _limit) {
@@ -58,7 +56,7 @@ Matrix identity_matrix(int n, int limit) {
     return res;
 }
 
-Matrix fast_pow(Matrix matrix, int degree) {
+Matrix fast_pow(Matrix matrix, int64_t degree) {
     Matrix res = identity_matrix(matrix.rows, matrix.limit);
 
     while (degree > 0) {
@@ -87,15 +85,15 @@ int main() {
         cin >> from >> to;
         --from;
         --to;
-        graph.values[from][to] = 1;
+        ++graph.values[from][to];
     }
 
     ++graph.values[n - 1][n];
     ++graph.values[n][n];
 
-    int l = 1, r = 1e9;
+    int64_t l = 1, r = 1ll * n * k;
     while (l <= r) {
-        int mid = (l + r) / 2;
+        int64_t mid = (l + r) / 2;
 
         Matrix curr = fast_pow(graph, mid);
         if (curr.values[0][n - 1] + curr.values[0][n] >= k) {
