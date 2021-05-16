@@ -5,6 +5,10 @@
 
 using namespace std;
 
+int generate_next(int last, int a, int b, int mod) {
+    return (1ll * last * a + b) % mod;
+}
+
 void update_tree(int ind, int64_t val, vector<int64_t>& tree, int n) {
     while (ind <= n) {
         tree[ind] += val;
@@ -49,7 +53,7 @@ int main() {
     
     update_range(1, 1, last, fenwick, n);
     for (int i = 2; i <= n; ++i) {
-        last = (last * a + b) % mod;
+        last = generate_next(last, a, b, mod);
         update_range(i, i, last, fenwick, n);
     }
 
@@ -58,8 +62,8 @@ int main() {
     
     int64_t res = 0;
     for (int i = 0; i < q; ++i) {
-        int l = (last * a + b) % n;
-        int r = (l * a + b) % n;
+        int l = generate_next(last, a, b, mod) % n;
+        int r = generate_next(l, a, b, mod) % n;
         last = r;
 
         if (l > r) {
@@ -73,7 +77,7 @@ int main() {
             continue;
         }
 
-        int new_val = (last * a + b) % mod;
+        int new_val = generate_next(last, a, b, mod);
         last = new_val;
 
         update_range(l, r, new_val, fenwick, n);
