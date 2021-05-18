@@ -1,11 +1,9 @@
-// Not solved - 65 points, runtime error (wrong answer to query at the middle)
-
-#include<iostream>
-#include<set>
-#include<map>
-#include<algorithm>
-#include<array>
-#include<random>
+#include <iostream>
+#include <set>
+#include <map>
+#include <algorithm>
+#include <array>
+#include <random>
 
 #define endl '\n'
 
@@ -211,6 +209,10 @@ int main() {
         if (m == 1) {
             pos ^= p;
             new_value ^= p;
+        }
+
+        if (nums[pos] == new_value) {
+            continue;
         }
 
         set<int> &prev_num = positions[nums[pos]];
